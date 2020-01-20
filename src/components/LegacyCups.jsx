@@ -28,7 +28,7 @@ class LegacyCups extends React.Component {
                 <thead>
                   <tr>
                     <th>SAI Debt</th>
-                    <th>Locked PETH</th>
+                    <th>Locked PTRX</th>
                     <th>% Ratio</th>
                     <th>Liquidation Price</th>
                     <th className="status-column">Status</th>
@@ -38,7 +38,7 @@ class LegacyCups extends React.Component {
                   <tr>
                     <td>
                       {
-                        this.props.system.tab(this.props.system.tub.legacyCups[key]).gte(0)
+                        this.props.system.tab(this.props.system.tub.legacyCups[key]) >= 0
                         ?
                           printNumber(this.props.system.tab(this.props.system.tub.legacyCups[key]))
                         :
@@ -47,7 +47,7 @@ class LegacyCups extends React.Component {
                     </td>
                     <td>
                       {
-                        this.props.system.tub.legacyCups[key].ink.gte(0)
+                        this.props.system.tub.legacyCups[key].ink > 0
                         ?
                           printNumber(this.props.system.tub.legacyCups[key].ink)
                         :
@@ -58,14 +58,14 @@ class LegacyCups extends React.Component {
                       {
                         this.props.system.tub.off === false
                         ?
-                          this.props.system.tub.legacyCups[key].ratio.lt(0)
+                          this.props.system.tub.legacyCups[key].ratio < 0
                           ?
                             "Loading..."
                           :
-                            this.props.system.tub.legacyCups[key].ratio.gt(0) && this.props.system.tub.legacyCups[key].ratio.toNumber() !== Infinity
+                            this.props.system.tub.legacyCups[key].ratio > 0 //&& this.props.system.tub.legacyCups[key].ratio.toNumber() !== Infinity
                             ?
                               <span>
-                                { printNumber(toWei(this.props.system.tub.legacyCups[key].ratio).times(100)) }<span className="unit">%</span>
+                                { printNumber(toWei(this.props.system.tub.legacyCups[key].ratio)*100) }<span className="unit">%</span>
                               </span>
                             :
                               "-"
@@ -75,11 +75,11 @@ class LegacyCups extends React.Component {
                     </td>
                     <td>
                       {
-                        this.props.system.tub.off === true || this.props.system.tub.legacyCups[key].liq_price.eq(0)
+                        this.props.system.tub.off === true || this.props.system.tub.legacyCups[key].liq_price == 0
                         ?
                           "-"
                         :
-                          this.props.system.tub.legacyCups[key].liq_price.gte(0)
+                          this.props.system.tub.legacyCups[key].liq_price > 0
                           ?
                             printNumber(this.props.system.tub.legacyCups[key].liq_price)
                           :
@@ -94,7 +94,7 @@ class LegacyCups extends React.Component {
                           ?
                             "Closed"
                           :
-                            this.props.system.tub.legacyCups[key].safe === "N/A" || this.props.system.pip.val.lt(0)
+                            this.props.system.tub.legacyCups[key].safe === "N/A" || this.props.system.pip.val < 0
                             ?
                               "N/A"
                             :
@@ -104,7 +104,7 @@ class LegacyCups extends React.Component {
                               :
                                 this.props.system.tub.legacyCups[key].safe
                                 ?
-                                  this.props.system.tub.legacyCups[key].art.eq(0) || this.props.system.tub.legacyCups[key].ratio.gte(2)
+                                  this.props.system.tub.legacyCups[key].art == 0 || this.props.system.tub.legacyCups[key].ratio >= 0
                                   ?
                                   <React.Fragment>
                                     <svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">

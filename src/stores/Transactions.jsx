@@ -39,7 +39,7 @@ export default class TransactionsStore {
   setLatestBlock = (block, flexible = false) => {
     if (block >= this.latestBlock) {
       this.amountCheck = 0;
-      console.debug(`Latest Block: ${block}`);
+      console.log(`Latest Block: ${block}`);
       this.latestBlock = block;
       return true;
     } else if (flexible && block + 5 >= this.latestBlock) {
@@ -53,15 +53,18 @@ export default class TransactionsStore {
   }
 
   setStandardGasPrice = async () => {
-    this.standardGasPrice = (await blockchain.getGasPrice()).div(10**9).ceil().toNumber();
+    //this.standardGasPrice = (await blockchain.getGasPrice()).div(10**9).ceil().toNumber();
+    return 0 ;
   }
 
   checkPendingTransactions = () => {
     Object.keys(this.registry).map(tx => {
       if (this.registry[tx].pending) {
         blockchain.getTransactionReceipt(tx).then(r => {
-          if (r !== null) {
-            if (r.status === "0x1") {
+          console.log("got ret", r["ret"], r.ret)
+          if (r.ret != null) {
+            if (r.ret[0].contractRet == "SUCCESS") {
+              console.log("SUCCESS!!!", r);
               this.logTransactionConfirmed(r);
             } else {
               this.logTransactionFailed(tx);
@@ -91,19 +94,53 @@ export default class TransactionsStore {
   }
 
   sendTransaction = (title, func, params, options, callbacks) => {
-    const cdpCreationTx = params[0] === settings.chain[this.rootStore.network.network].proxyRegistry || // This means it is calling to the createLockAndDraw
-                          (typeof params[1] === "string" && methodSig("lockAndDraw(address,uint256)") === params[1].substring(0, 10));
+    const cdpCreationTx = params[0] === blockchain.objects.proxyRegistry.address // This means it is calling to the createLockAndDraw
+                       // ||   (typeof params[1] === "string" && methodSig("lockAndDraw(address,uint256)") === params[1].substring(0, 10));
+
     const id = Math.random();
+
     this.logRequestTransaction(id, title, cdpCreationTx);
-    func(...params, options, (e, tx) => this.log(e, tx, id, title, callbacks));
+
+    console.log("params ", params, "options", options, "cdpCreationTx", cdpCreationTx);
+
+    options.from = window.tronWeb.defaultAddress.base58;
+    const BigNumber = require('bignumber.js');
+    let x = new BigNumber(options.callValue);
+    //c.then(o => {
+      //o.createOpenLockAndDraw(...params, options, (e, tx) => this.log(e, tx, id, title, callbacks));
+/*
+      func(...params).send({
+        //options
+        callValue: options.callValue 
+      }).then(data => {
+           data = ({ ...data, tx: data });        
+           console.log("sent Transaction, response" , data);
+
+      })
+*/
+     func(...params).send({
+        //options
+        callValue:x  
+      }).then((tx) => {
+
+        console.log("got tx", tx )
+
+        this.log(null, tx, id, title, callbacks);
+
+      }).catch((err) => {
+        console.log("error", err)
+      });
+
+    //})
+    //c.createOpenLockAndDraw(...params, options, (e, tx) => this.log(e, tx, id, title, callbacks));
   }
 
-  askPriceAndSend = (title, func, params, options, callbacks) => {
-    if (this.rootStore.network.hw.active) { // If user is using HW, gas price modal will appear
-      this.priceModal = { open: true, title, func, params, options, callbacks };
-    } else {
-      this.sendTransaction(title, func, params, options, callbacks);
-    }
+  askPriceAndSend = (title, c, params, options, callbacks) => {
+    //if (this.rootStore.network.hw.active) { // If user is using HW, gas price modal will appear
+    //  this.priceModal = { open: true, title, func, params, options, callbacks };
+    //} else {
+      this.sendTransaction(title, c, params, options, callbacks);
+    //}
   }
 
   setPriceAndSend = gasPriceGwei => {
@@ -119,10 +156,11 @@ export default class TransactionsStore {
     registry[tx] = {pending: true, title, callbacks, cdpCreationTx: this.cdpCreationTx};
     this.registry = registry;
     this.cdpCreationTx = false;
-    console.debug(msgTemp.replace("TX", tx));
+    console.log(msgTemp.replace("TX", tx));
     this.notificator.hideNotification(id);
     if (!this.registry[tx].cdpCreationTx) {
-      this.notificator.info(tx, title, etherscanTx(this.rootStore.network.network, msgTemp.replace("TX", `${tx.substring(0,10)}...`), tx), false);
+      //etherscanTx(this.rootStore.network.network, msgTemp.replace("TX", `${tx.substring(0,10)}...`), tx);
+      this.notificator.info(tx, title, tx, false);
     }
   }
 
@@ -134,7 +172,7 @@ export default class TransactionsStore {
       const registry = {...this.registry};
       registry[tx].pending = false;
       this.registry = registry;
-      console.debug(msgTemp.replace("TX", tx), object.blockNumber);
+      console.log(msgTemp.replace("TX", tx), object.blockNumber);
       this.notificator.hideNotification(tx);
       if (!this.registry[tx].cdpCreationTx) {
         this.notificator.success(tx, this.registry[tx].title, etherscanTx(this.rootStore.network.network, msgTemp.replace("TX", `${tx.substring(0,10)}...`), tx), 6000);
@@ -152,7 +190,7 @@ export default class TransactionsStore {
       registry[tx].pending = false;
       registry[tx].cdpCreationTx = false;
       this.registry = registry;
-      console.debug(msgTemp.replace("TX", tx));
+      console.log(msgTemp.replace("TX", tx));
       this.notificator.error(tx, this.registry[tx].title, msgTemp.replace("TX", `${tx.substring(0,10)}...`), 5000);
       this.lookForCleanCallBack(this.registry[tx].callbacks);
     }
@@ -208,7 +246,9 @@ export default class TransactionsStore {
     const timeout = ["transactions/cleanLoading", "system/changeAllowance", "system/checkAllowance", "system/lockAndDraw", "system/wipeAndFree", "system/lock", "system/draw", "system/wipe", "system/free", "system/shut", "system/give", "system/migrateCDP", "system/moveLegacyCDP"].indexOf(method) !== -1 ? 0 : 5000;
     setTimeout(() => {
       method = method.split("/");
-      console.debug("executeCallback", `${method[0]}.${method[1]}`, args);
+
+      console.log("executeCallback", `${method[0]}.${method[1]}`, args);
+
       if (method[0] === "transactions") {
         this[method[1]](...args);
       } else {
@@ -224,6 +264,7 @@ export default class TransactionsStore {
             break;
         }
         object && object[method[1]](...args);
+        //console.log("called", object[method[1]](...args))
       }
     }, timeout);
   }

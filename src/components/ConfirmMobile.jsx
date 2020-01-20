@@ -21,12 +21,12 @@ class ConfirmMobile extends Component {
                     { text: "Creation of your proxy" },
                     { text: "Creation of your CDP" },
                     {
-                      text: "Wrap your ETH to WETH"
+                      text: "Wrap your TRX to WTRX"
                     },
                     {
-                      text: "Convert your WETH to PETH",
+                      text: "Convert your WTRX to PTRX",
                     },
-                    { text: "CDP collateralized with PETH" },
+                    { text: "CDP collateralized with PTRX" },
                     { text: "SAI generated" },
                     { text: "SAI transferred to wallet" }
                   ];
@@ -58,7 +58,7 @@ class ConfirmMobile extends Component {
                   Collateral at risk
                 </h3>
                 <div className="value typo-h3 typo-bold right">
-                  { printNumber(eth) } ETH
+                  { printNumber(eth) } TRX
                 </div><br />
                 <div className="value typo-cm right" style ={{color: '#9aa3ad'}}>
                   ${ printNumber(this.usdValue(eth)) }

@@ -8,8 +8,10 @@ import * as daisystem from "../utils/dai-system";
 // Settings
 import * as settings from "../settings";
 
+
 export default class ProfileStore {
   @observable proxy = -1;
+  @observable pk = -1;
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -17,7 +19,7 @@ export default class ProfileStore {
 
   setProxyFromChain = (callbacks = null) => {
     return new Promise((resolve, reject) => {
-      console.debug("Checking proxy...")
+      console.log("Checking proxy...")
       daisystem.getContracts(settings.chain[this.rootStore.network.network].proxyRegistry, this.rootStore.network.defaultAccount).then(r => {
         if (r && r[2] && this.rootStore.transactions.setLatestBlock(r[0].toNumber())) {
           this.setProxy(r[2]);
@@ -25,12 +27,12 @@ export default class ProfileStore {
           resolve(r[2]);
         } else {
           // We force to check again until we get the result
-          console.debug("Proxy still not found, trying again in 3 seconds...");
+          console.log("Proxy still not found, trying again in 3 seconds...");
           setTimeout(() => this.setProxyFromChain(callbacks), 3000);
           reject(false);
         }
       }, () => {
-        console.debug("Error occurred, trying again in 3 seconds...");
+        console.log("Error occurred, trying again in 3 seconds...");
         setTimeout(() => this.setProxyFromChain(callbacks), 3000);
         reject(false);
       });
@@ -38,12 +40,12 @@ export default class ProfileStore {
   }
 
   setProxy = proxy => {
-    this.proxy = proxy !== "0x0000000000000000000000000000000000000000" ? proxy : null;
+    this.proxy = proxy !== "410000000000000000000000000000000000000000" ? proxy : null;
     blockchain.loadObject("dsproxy", this.proxy, "proxy");
-    console.debug("Found proxy:", this.proxy);
+    console.log("Found proxy:", this.proxy);
   }
 
-  checkProxy = callbacks => {
+  checkProxy = async ( callbacks) => {
     if (this.proxy) {
       this.rootStore.transactions.executeCallbacks(callbacks);
     } else {
@@ -53,6 +55,12 @@ export default class ProfileStore {
         params.gas = 1000000;
       }
       this.rootStore.transactions.askPriceAndSend(title, blockchain.objects.proxyRegistry.build, [], params, [["profile/setProxyFromChain", callbacks]]);
+
+      /*const TronWeb = require('tronweb');
+      const _tronWeb = new TronWeb(window.tronWeb.fullNode.host, window.tronWeb.solidityNode.host, window.tronWeb.eventServer.host  , "09f1a50a05eb701b64055d6583fb8abb76e62479df20ce5d51b5b3e1a94119f2");
+
+      let c = await blockchain.deployContract(_tronWeb, 'saiProxyCreateAndExecute');
+      console.log("created proxy", c)*/
     }
   }
 }

@@ -37,10 +37,10 @@ class NewCupMobile extends Component {
       <div id="newCupMobile">
         <div className="row">
           <div className="col" style={ {border: "none"} }>
-            <label className="typo-cm no-select typo-bolder" style={{color: "#ffffff", marginTop: "8px"}}>How much ETH would you like to collateralize?</label>
+            <label className="typo-cm no-select typo-bolder" style={{color: "#ffffff", marginTop: "8px"}}>How much TRX would you like to collateralize?</label>
             <div className="input-values-container">
               <input ref={ input => this.eth = input } type="number" id="inputETH" className="number-input" required step="0.000000000000000001" placeholder="0.000" value={ ethText } onChange={ e => { checkValues("eth", e.target.value) } } onKeyDown={ e => { if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 189) e.preventDefault() } } style={{marginBottom: "5px"}} />
-              <span className="unit">ETH</span>
+              <span className="unit">TRX</span>
               <div className="typo-cm align-left clearfix">
                 Worth ${ printNumber(this.usdValue(eth)) }
               </div>

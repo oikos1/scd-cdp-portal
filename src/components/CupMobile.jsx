@@ -45,14 +45,14 @@ class CupMobile extends Component {
           Deposit
         </a>
         <div style={{maxWidth: "fit-content"}}>
-          <div className="block typo-c" style={{fontSize: "1.3em", lineHeight: "1"}}>ETH Collateral</div>
+          <div className="block typo-c" style={{fontSize: "1.3em", lineHeight: "1"}}>TRX Collateral</div>
           <div>
             {
               cup && cup.ink.gte(0) && this.props.system.tub.per.gte(0) && this.props.system.pip.val.gte(0)
               ?
                 <React.Fragment>
                   <div className="value block typo-cxl" style={ {fontSize: "1.7em", lineHeight: "1.5"} }>
-                    { printNumber(wmul(cup.ink, this.props.system.tub.per)) }<span className="unit" style={{color: "#ffffff"}}>ETH</span>
+                    { printNumber(wmul(cup.ink, this.props.system.tub.per)) }<span className="unit" style={{color: "#ffffff"}}>TRX</span>
                   </div>
                   <div className="block typo-c" style={ {fontSize: "1.3em", lineHeight: "0.7"} }>
                     ${ printNumber(wmul(wmul(cup.ink, this.props.system.tub.per), this.props.system.pip.val)) }

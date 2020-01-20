@@ -42,7 +42,7 @@ class Help extends React.Component {
                       <li><Link to="/help/what-is-the-best-way-to-lower-my-risk-of-liquidation">What is the best way to lower my risk of liquidation?</Link></li>
                       <li><Link to="/help/what-is-the-stability-fee">What is the Stability Fee?</Link></li>
                       <li><Link to="/help/when-do-i-have-to-pay-the-stability-fee">When do I have to pay the Stability Fee?</Link></li>
-                      <li><Link to="/help/what-is-peth">What is PETH?</Link></li>
+                      <li><Link to="/help/what-is-peth">What is PTRX?</Link></li>
                       <li><Link to="/help/how-do-i-get-mkr-tokens">How do I get MKR tokens?</Link></li>
                     </ul>
                   </div>

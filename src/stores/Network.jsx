@@ -3,6 +3,7 @@ import {observable} from "mobx";
 import checkIsMobile from 'ismobilejs'
 import mixpanel from 'mixpanel-browser';
 import WalletLink from "walletlink";
+import tronWeb, { initTronweb } from 'tronweb';
 
 // Utils
 import * as blockchain from "../utils/blockchain";
@@ -25,22 +26,29 @@ export default class NetworkStore {
   isMobile = checkIsMobile.any;
   isMobileWeb3Wallet = blockchain.isMobileWeb3Wallet();
   walletLinkProvider = null;
+
   constructor(rootStore) {
     this.rootStore = rootStore;
   }
 
   setNetwork = async () => {
     try {
+
       const result = await blockchain.checkNetwork(this.isConnected, this.network);
+      console.log("setNetwork", result);
+
       Object.keys(result.data).forEach(key => { this[key] = result.data[key]; });
-      if (!this.stopIntervals && result.status) {
+      /*if (!this.stopIntervals && result.status) {
         this.setAccount();
         if (!this.hw.active) {
           this.setAccountInterval = setInterval(this.setAccount, 1000);
         }
-      }
+      }*/
+
+      //this.setDefaultAccount("TJb4Gy2BotytAvW1ENBZkkMVqmwWnBtb2o");
+      this.setAccount();
     } catch(e) {
-      console.debug(e);
+      console.log(e);
     }
   }
 
@@ -65,9 +73,59 @@ export default class NetworkStore {
   }
 
   setAccount = () => {
-    blockchain.getAccounts().then(async accounts => {
-      if (this.network && !this.hw.active && accounts && accounts[0] !== blockchain.getDefaultAccount()) {
-        const account = await blockchain.getDefaultAccountByIndex(0);
+
+      //tron钱包相关对象
+      let tronWeb = false;
+      let tronWeb2 = false;
+      let scatter = false;
+      let network = {};
+      let walletAddress = false;
+
+      let nowWallet = "tronLink";
+
+      let tmpTimer1 = null;
+      let tmpTimer2 = null;  
+
+      if (window.tronWeb){
+            console.log(" tWda" , window.tronWeb.defaultAddress);
+            if (window.tronWeb.defaultAddress.base58 != false) {
+              //clearInterval(tmpTimer2);
+              walletAddress = window.tronWeb.defaultAddress.base58;
+              window.myAddress = walletAddress;
+              window.tronWeb.setAddress(walletAddress);
+              //window.socket.emit("login", {addr: walletAddress});
+              ////cb();
+            } else {
+              console.log('err address ' , walletAddress);
+            }
+      }      
+
+      //tmpTimer1 = setInterval(()=>{
+        //if (tronWeb) {
+          //clearInterval(tmpTimer1);
+          //tronWeb = tronWeb;
+          //if(tmpTimer2) clearInterval(tmpTimer2);
+          //1s检测钱包是否登录
+          //tmpTimer2 = setInterval(()=>{
+            //console.log("identity: ", tronWeb.defaultAddress);
+            //if (window.tronWeb.defaultAddress.base58 != false) {
+              //clearInterval(tmpTimer2);
+              //walletAddress = tronWeb.defaultAddress.base58;
+              //window.myAddress = walletAddress;
+              //window.socket.emit("login", {addr: walletAddress});
+              ////cb();
+            //} else {
+            //  console.log('err address false');
+            //}
+          //}, 1000);
+
+        //}
+      //}, 1000);
+      //console.log("set address to " + walletAddress);
+
+    //blockchain.getAccounts().then(async accounts => {
+      /*if (this.network && !this.hw.active) {
+        //const account = await blockchain.getDefaultAccountByIndex(0);
         if (!this.stopIntervals) { // To avoid race condition
           this.setDefaultAccount(account);
         }
@@ -82,14 +140,19 @@ export default class NetworkStore {
           this.loadingAddress = false;
         }
       }
-    }, () => {});
+    //}, () => {});*/
+    this.setDefaultAccount(walletAddress);
   }
 
   setDefaultAccount = account => {
-    account = account.toLowerCase();
+    console.log('sda ' + account)
+    //account = account.toLowerCase();
     blockchain.setDefaultAccount(account);
 
-    const wallet = this.hw.active && this.hw.option ? this.hw.option.replace(/-(live|legacy)$/i, '') : blockchain.getWebClientProviderName();
+    this.defaultAccount = account;
+    console.log("da : " + this.defaultAccount);
+
+    /*const wallet = this.hw.active && this.hw.option ? this.hw.option.replace(/-(live|legacy)$/i, '') : blockchain.getWebClientProviderName();
     const mixpanelProps = { wallet };
     if (wallet === 'ledger') mixpanelProps['ledgerAccountType'] = this.hw.option;
     mixpanelIdentify(account, mixpanelProps);
@@ -104,9 +167,13 @@ export default class NetworkStore {
       wallet
     };
     if (wallet === 'ledger') trackProps['ledgerAccountType'] = this.hw.option;
-    mixpanel.track('account-change', trackProps);
+    mixpanel.track('account-change', trackProps);*/
 
-    console.debug(`Detected wallet: ${wallet}`);
+    let network = 'mainnet';
+    const wallet = blockchain.getWebClientProviderName();
+    console.log(`Detected wallet: ${wallet}`);
+    this.rootStore.loadContracts();
+
   }
 
   // Web3 web client
@@ -114,19 +181,24 @@ export default class NetworkStore {
     try {
       this.stopIntervals = false;
       this.loadingAddress = true;
-      this.waitingForAccessApproval = typeof window.ethereum !== "undefined";
+      //this.waitingForAccessApproval =  false; //typeof window.ethereum !== "undefined";
       const provider = await blockchain.setWebClientWeb3();
       this.waitingForAccessApproval = false;
+      //console.log("provider is : " + JSON.stringify(provider));
+      console.log('Provider is : ', provider);
+
       await blockchain.setWebClientProvider(provider);
+
       this.setNetwork();
-      this.setNetworkInterval = setInterval(this.setNetwork, 3000);
+      //this.setNetworkInterval = setInterval(this.setNetwork, 3000);
+
     } catch (e) {
       this.loadingAddress = false;
       this.waitingForAccessApproval = false;
       if (e.message === "No client") {
         this.downloadClient = true;
       }
-      console.debug(e);
+       console.log(e);
     }
   }
 
@@ -146,7 +218,7 @@ export default class NetworkStore {
       this.walletLinkProvider = walletLink.makeWeb3Provider(rpcUrl, chainId);
 
       this.walletLinkProvider.on('accountsChanged', accounts => {
-        console.debug('[WalletLink] accountsChanged:', accounts);
+        console.log('[WalletLink] accountsChanged:', accounts);
       });
     }
 
@@ -162,7 +234,7 @@ export default class NetworkStore {
     } catch (e) {
       this.loadingAddress = false;
       this.waitingForAccessApproval = false;
-      console.debug('[WalletLink] Error:', e);
+      console.log('[WalletLink] Error:', e);
     }
   }
 

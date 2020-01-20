@@ -1,6 +1,7 @@
 // Libraries
 import React from "react";
 import Promise from "bluebird";
+import tronWeb, { initTronweb } from 'tronweb';
 
 // Utils
 import * as blockchain from "./blockchain";
@@ -8,11 +9,22 @@ import {fromWei, wmul, wdiv, toChecksumAddress, toBytes32, formatDate, printNumb
 
 import * as settings from "../settings";
 
+const CryptoUtils = require("@tronscan/client/src/utils/crypto");
+
+
+//1000000000 1000000000000000000 1500000000000000000 1111000000000000000000 1000000000000000000
+
+
 export const calculateLiquidationPrice = (par, per, mat, skr, dai) => {
+  //console.log(par.toFixed(), per.toFixed(), mat.toFixed(), skr.toFixed(), dai.toFixed())
+
+    //console.log( wmul(wmul(dai, par), mat).toFixed()  + " / " + wmul(skr, per).toFixed() );
+
   return wdiv(wmul(wmul(dai, par), mat), wmul(skr, per));
 }
 
 export const calculateRatio = (tag, par, skr, dai) => {
+
   return wdiv(wmul(skr, tag).round(0), wmul(dai, par));
 }
 
@@ -25,32 +37,40 @@ export const rap = (cup, rhi, chi) => {
 }
 
 export const getCup = id => {
-  console.debug(`getCup: ${id}`)
+  console.log(`getCup: ${id}`)
   return new Promise((resolve, reject) => {
-    blockchain.objects.saiValuesAggregator.aggregateCDPValues(toBytes32(id), (e, cup) => {
-      if (!e) {
+    blockchain.objects.saiValuesAggregator.aggregateCDPValues(toBytes32(id))
+    .send({
+            from: window.tronWeb.defaultAddress.base58,           
+            shouldPollResponse: true
+          })
+    .then((cup) => {
+      if (!cup.safe || cup.safe) {
+        console.log("cupData", cup);        
         const cupData = {
           id: parseInt(id, 10),
-          lad: cup[1],
-          safe: cup[2],
-          ink: cup[3][0],
-          art: cup[3][1],
-          ire: cup[3][2],
-          ratio: fromWei(cup[3][3]),
-          avail_dai: cup[3][4],
-          avail_skr: cup[3][5],
-          avail_eth: cup[3][6],
-          liq_price: cup[3][7]
+          lad: cup.lad,
+          safe: cup.safe,
+          ink: cup.r[0],
+          art: cup.r[1],
+          ire: cup.r[2],
+          ratio: fromWei(cup.r[3]),
+          avail_dai: cup.r[4],
+          avail_skr: cup.r[5],
+          avail_eth: cup.r[6],
+          liq_price: cup.r[7]
         };
-        resolve({block: cup[0].toNumber(), cupData});
+        resolve({block: cup.blockNumber, cupData});
       } else {
-        reject(e);
+        console.log("error, empty cup");
+        reject("error, empty cup");
       }
     });
   });
 }
 
 export const getFromService = (network, query) => {
+    console.log('getFromService', query)
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.timeout = settings.chain[network].serviceTimeout;
@@ -70,13 +90,17 @@ export const getFromService = (network, query) => {
 }
 
 export const getCupsFromService = (network, lad) => {
+    console.log('getCupsFromService')
+    lad = window.tronWeb.address.toHex(lad);
   return new Promise((resolve, reject) => {
-    getFromService(network, `{ allCups( condition: { lad: "${toChecksumAddress(lad)}" } ) { nodes { id, block } } }`)
+    getFromService(network, `{ allCups( condition: { lad: "${lad}" } ) { nodes { id, block } } }`)
     .then(r => resolve(r.data.allCups.nodes), e => reject(e))
   });
 }
 
 export const getCupHistoryFromService = (network, cupId) => {
+    console.log('getCupHistoryFromService')
+
   return new Promise((resolve, reject) => {
     getFromService(network, `{ getCup(id: ${cupId}) { actions { nodes { act arg guy tx time ink art per pip } } } }`)
     .then(r => resolve(r.data.getCup ? r.data.getCup.actions.nodes : null), e => reject(e))
@@ -84,6 +108,7 @@ export const getCupHistoryFromService = (network, cupId) => {
 }
 
 export const getBiteNotification = (cupId, history, alreadyClosed) => {
+
   const latestAction = history[0];
   if (latestAction && latestAction.act === "BITE" && !alreadyClosed) {
     const prevlatestAction = history[1];
@@ -102,21 +127,21 @@ export const getBiteNotification = (cupId, history, alreadyClosed) => {
                 Your CDP #{cupId} was liquidated on { date } to pay back { printNumber(art) } SAI.
               </div>
               <div className="grouped-section">
-                <div className="dark-text">Total ETH (PETH) liquidated</div>
+                <div className="dark-text">Total TRX (PTRX) liquidated</div>
                 <div style={ {fontSize: "1.3rem", fontWeight: "600" } }>{ printNumber(liqETH) } ETH</div>
-                <div className="dark-text">{ printNumber(liqInk) } PETH</div>
+                <div className="dark-text">{ printNumber(liqInk) } PTRX</div>
               </div>
               <div className="indented-section">
                 <div className="line-indent"></div>
                 <div className="grouped-section">
                   <div className="dark-text">Collateral</div>
                   <div style={ {fontSize: "1.1rem", fontWeight: "600" } }>{ printNumber(liqETHCol) } ETH</div>
-                  <div className="dark-text">{ printNumber(liqInkCol) } PETH</div>
+                  <div className="dark-text">{ printNumber(liqInkCol) } PTRX</div>
                 </div>
                 <div className="grouped-section">
                   <div className="dark-text">13% liquidation penalty</div>
                   <div style={ {fontSize: "1.1rem", fontWeight: "600" } }>{printNumber(liqETHPen)} ETH</div>
-                  <div className="dark-text">{printNumber(liqInkPen)} PETH</div>
+                  <div className="dark-text">{printNumber(liqInkPen)} PTRX</div>
                 </div>
               </div>
               <div className="grouped-section">
@@ -159,26 +184,34 @@ export const futureRap = (cup, age, chi, rhi, tax, fee) => {
           ).round(0);
 }
 
-export const getContracts = (proxyRegistry, address) => {
+export const getContracts = async (proxyRegistry, address) => {
   return new Promise((resolve, reject) => {
-    blockchain.objects.saiValuesAggregator.getContractsAddrs(proxyRegistry, address, (e, r) => {
-      if (!e) {
-        resolve(r);
-      } else {
-        reject(e);
-      }
+  blockchain.objects.saiValuesAggregator.getContractsAddrs(proxyRegistry, address).call({
+            shouldPollResponse: true,
+            callValue: 0, 
+            from : window.tronWeb.defaultAddress.base58
+        }).then(function (r) {
+            console.log(r)
+            resolve(r);
+
+        }).catch(function (e) {
+          reject(e);
     });
+
   });
 }
 
-export const getAggregatedValues = (account, proxy) => {
+export const getAggregatedValues = (address, proxy) => {
+  
   return new Promise((resolve, reject) => {
-    blockchain.objects.saiValuesAggregator.aggregateValues.call(account, proxy, { from: "0x0000000000000000000000000000000000000000" }, (e, r) => {
-      if (!e) {
-        resolve(r);
-      } else {
-        reject(e);
-      }
+    blockchain.objects.saiValuesAggregator.aggregateValues(address, proxy).send({
+            shouldPollResponse: true,
+            callValue: 0, 
+            from : window.tronWeb.defaultAddress.base58
+        }).then(function (r) {
+            resolve(r);
+        }).catch(function (e) {
+          reject(e);
     });
   });
 }

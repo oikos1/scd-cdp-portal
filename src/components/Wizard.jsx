@@ -49,14 +49,14 @@ class Wizard extends Component {
                     { text: "Creation of your proxy" },
                     { text: "Creation of your CDP" },
                     {
-                      text: "Wrap your ETH to WETH - ERC20 tokenization",
+                      text: "Wrap your TRX to WTRX - ERC20 tokenization",
                       tip: <TooltipHint tipKey="wizard-wrap-eth-to-weth" />
                     },
                     {
-                      text: "Convert your WETH to PETH",
+                      text: "Convert your WTRX to PTRX",
                       tip: <TooltipHint tipKey="wizard-convert-weth-to-peth" />
                     },
-                    { text: "CDP collateralized with PETH - Your converted ETH is locked" },
+                    { text: "CDP collateralized with PTRX - Your converted TRX is locked" },
                     { text: "SAI generated -  Your requested SAI is generated" },
                     { text: "SAI transferred - Your requested SAI is transferred to your wallet" }
                   ];
@@ -68,7 +68,8 @@ class Wizard extends Component {
   }
 
   checkValues = (token, amount) => {
-    const amountBN = toBigNumber(amount);
+    console.log("checking " + token + " amount " , amount); 
+    const amountBN = toBigNumber(amount);console.log(amountBN);
     const state = {...this.state};
     state[token] = toWei(amountBN);
     state[`${token}Text`] = amount;
@@ -81,25 +82,39 @@ class Wizard extends Component {
 
     if (state.eth.gt(0)) {
       state.skr = wdiv(state.eth, this.props.system.tub.per).floor();
-      state.maxDaiAvail = wdiv(wmul(state.skr, this.props.system.tub.tag), wmul(this.props.system.tub.mat, this.props.system.vox.par)).floor();
+
+      console.log("state skr : ",  state.skr.toFixed()   )
+      console.log("state tub per : ",  this.props.system.tub.per.toFixed())
+      console.log("state tub tag : ",  this.props.system.tub.tag.toFixed())
+      console.log("wdiv ", wdiv(state.eth, this.props.system.tub.per).toFixed()); 
+      console.log("dollar value of skr ", wmul(state.skr, this.props.system.tub.tag).toFixed())
+      console.log("mat value : ", this.props.system.tub.mat.toFixed());
+      console.log("Vox par : " , this.props.system.vox.par.toFixed());
+
+      console.log(" liquidation ratio multiplied by DAI price ",  wmul(this.props.system.tub.mat, this.props.system.vox.par).toFixed())
+
+      state.maxDaiAvail = wdiv( wmul(state.skr, this.props.system.tub.tag), wmul(this.props.system.tub.mat, this.props.system.vox.par)).floor();
     }
 
     if (state.dai.gt(0)) {
       state.minETHReq = wmul(wdiv(wmul(state.dai, wmul(this.props.system.tub.mat, this.props.system.vox.par)), this.props.system.tub.tag), this.props.system.tub.per).round(0);
     }
 
+    
     this.setState(state, () => {
       this.setState(prevState => {
         const state = {...prevState};
+        state.liqPrice = this.props.system.calculateLiquidationPrice(state.skr, state.dai);
 
-        state.submitEnabled = false;
+        //state.submitEnabled = false;
         state.error = false;
-
-        if (state.eth.gt(0) && this.props.system.eth.myBalance.lt(state.eth)) {
-          state.error = "The amount of ETH to be deposited exceeds your current balance.";
+        //state.submitEnabled = true;
+        return state;
+        /*if (state.eth.gt(0) && this.props.system.eth.myBalance.lt(state.eth)) {
+          state.error = "The amount of TRX to be deposited exceeds your current balance.";
           return state;
         } else if (state.skr.gt(0) && state.skr.round(0).lte(toWei(0.005))) {
-          state.error = `You are not allowed to deposit a low amount of ETH in a CDP. It needs to be higher than 0.005 PETH (${formatNumber(wmul(toBigNumber(toWei(0.005)), this.props.system.tub.per), 18)} ETH at actual price).`;
+          state.error = `You are not allowed to deposit a low amount of TRX in a CDP. It needs to be higher than 0.005 PTRX (${formatNumber(wmul(toBigNumber(toWei(0.005)), this.props.system.tub.per), 18)} TRX at actual price).`;
           return state;
         }
 
@@ -107,7 +122,7 @@ class Wizard extends Component {
           if (this.props.system.sin.totalSupply.add(state.dai).gt(this.props.system.tub.cap)) {
             state.error = "The amount of SAI you are trying to generate exceeds the current system debt ceiling.";
           } else if (state.dai.gt(state.maxDaiAvail)) {
-            state.error = "The amount of ETH to be deposited is not enough to draw this amount of SAI.";
+            state.error = "The amount of TRX to be deposited is not enough to draw this amount of SAI.";
           } else {
             state.liqPrice = this.props.system.calculateLiquidationPrice(state.skr, state.dai);
             state.ratio = this.props.system.calculateRatio(state.skr, state.dai);
@@ -117,8 +132,8 @@ class Wizard extends Component {
             state.submitEnabled = true;
           }
           return state;
-        }
-      })
+        }*/
+      });
     });
   }
 
@@ -133,6 +148,7 @@ class Wizard extends Component {
   }
 
   execute = e => {
+    console.log("execute")
     this.props.system.lockAndDraw(false, fromWei(this.state.eth), fromWei(this.state.dai));
   }
 

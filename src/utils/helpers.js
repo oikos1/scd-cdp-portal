@@ -37,6 +37,10 @@ export const addressToBytes32 = (x, prefix = true) => {
   return y;
 }
 
+export const toSun = (wad) =>{
+  const BigNumber = require('bignumber.js');
+  return new BigNumber((wad * (10**6)));
+};
 export const formatAmount = amount => amount ? web3.fromWei(toBigNumber(amount).round(0)).valueOf() : '';
 
 export const formatNumber = (number, decimals = false, isWei = true, round = false) => {
@@ -90,6 +94,55 @@ export const mobileToggle = className => {
     : className
 }
 
+
+//16进制的ASCII字符串转为byteArray格式。
+export const hexStr2byteArray = str => {
+  var byteArray = Array();
+  var d = 0;
+  var j = 0;
+  var k = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    var c = str.charAt(i);
+    if (isHexChar(c)) {
+      d <<= 4;
+      d += hexChar2byte(c);
+      j++;
+      if (0 === (j % 2)) {
+        byteArray[k++] = d;
+        d = 0;
+      }
+    }
+  }
+  return byteArray;
+}
+
+/* Check if a char is hex char */
+export const isHexChar = c => {
+  if ((c >= 'A' && c <= 'F') ||
+      (c >= 'a' && c <= 'f') ||
+      (c >= '0' && c <= '9')) {
+    return 1;
+  }
+  return 0;
+}
+
+/* Convert a hex char to value */
+export const hexChar2byte = c => {
+  var d = 0;
+  if (c >= 'A' && c <= 'F') {
+    d = c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+  }
+  else if (c >= 'a' && c <= 'f') {
+    d = c.charCodeAt(0) - 'a'.charCodeAt(0) + 10;
+  }
+  else if (c >= '0' && c <= '9') {
+    d = c.charCodeAt(0) - '0'.charCodeAt(0);
+  }
+  return d;
+}
+
+
 export const copyToClipboard = e => {
   const value = e.target.title.replace(/,/g, "");
   var aux = document.createElement("input");
@@ -119,10 +172,10 @@ export const copyToClipboard = e => {
   });
   e.target.appendChild(div);
   const parent = e.target;
-  setTimeout(() => parent.removeChild(div), 1000);
+  //setTimeout(() => parent.removeChild(div), 1000);
 }
 
-export const printNumber = (number, decimalPlaces = 3, round = false) => {
+export const printNumber = (number, decimalPlaces = 4, round = false) => {
   return <span className="printedNumber" onClick={ copyToClipboard } title={ formatNumber(number, false) }>{ formatNumber(number, decimalPlaces, true, round) }</span>
 }
 

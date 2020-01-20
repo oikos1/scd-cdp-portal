@@ -32,7 +32,15 @@ class WalletClientSelector extends React.Component {
               </React.Fragment>
           }
           </a>
-          {
+
+        </section>
+      </div>
+    )
+  }
+}
+
+export default WalletClientSelector;
+          /*{
           navigator.userAgent.toLowerCase().indexOf("firefox") === -1 &&
           <a href="#action" onClick={ e => { e.preventDefault(); this.props.network.showHW("ledger") } }>
             <div className="provider-icon">{ walletIcons["ledger"] }</div>
@@ -46,11 +54,4 @@ class WalletClientSelector extends React.Component {
           <a href="#action" onClick={ e => { e.preventDefault(); this.props.network.startWalletLink() } }>
             <div className="provider-icon">{ walletIcons["walletlink"] }</div>
             Coinbase Wallet
-          </a>
-        </section>
-      </div>
-    )
-  }
-}
-
-export default WalletClientSelector;
+          </a>*/

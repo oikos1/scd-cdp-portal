@@ -22,23 +22,23 @@ class Cup extends React.Component {
 
     const actions = {
       lock: {
-              active: this.props.system.tub.off === false && this.props.system.eth.myBalance && this.props.system.eth.myBalance.gt(0),
+              active: this.props.system.tub.off === false && this.props.system.eth.myBalance && this.props.system.eth.myBalance>0,
               helper: "Add collateral to a CDP"
             },
       free: {
-              active: this.props.system.pip.val.gt(0) && cup.ink.gt(0) && cup.safe && (this.props.system.tub.off === false || cup.art.eq(0)),
+              active: this.props.system.pip.val>0 && cup.ink>0 && cup.safe && (this.props.system.tub.off === false || cup.art==0),
               helper: "Remove collateral from a CDP"
             },
       draw: {
-              active: this.props.system.pip.val.gt(0) && this.props.system.tub.off === false && cup.ink.gt(0) && cup.safe,
+              active: this.props.system.pip.val>0 && this.props.system.tub.off === false && cup.ink>0 && cup.safe,
               helper: "Create Sai against a CDP"
             },
       wipe: {
-              active: this.props.system.tub.off === false && cup.art.gt(0),
+              active: this.props.system.tub.off === false && cup.art>0,
               helper: "Use Sai to cancel CDP debt"
             },
       shut: {
-              active: this.props.system.pip.val.gt(0) && this.props.system.tub.off === false,
+              active: this.props.system.pip.val>0 && this.props.system.tub.off === false,
               helper: "Close a CDP - Wipe all debt, Free all collateral, and delete the CDP"
             },
       give: {
@@ -68,15 +68,15 @@ class Cup extends React.Component {
         <div className="row cup-price-information">
           <div className="col col-2">
             <div style={ {marginBottom: "1rem"}}>
-              <h3 className="typo-cxl inline-headline">Liquidation price (ETH/USD)</h3>
+              <h3 className="typo-cxl inline-headline">Liquidation price (TRX/USD)</h3>
               <TooltipHint tipKey="liquidation-price" />
               <div className="value typo-cxl right strong-text">
                 {
-                  this.props.system.tub.off === true || (cup.liq_price && cup.liq_price.eq(0))
+                  this.props.system.tub.off === true || (cup.liq_price && cup.liq_price == 0 )
                   ?
                     "-"
                   :
-                    cup.liq_price && cup.liq_price.gte(0)
+                    cup.liq_price && cup.liq_price >= 0
                     ?
                       <span>{ printNumber(cup.liq_price) }<span className="unit">USD</span></span>
                     :
@@ -85,11 +85,11 @@ class Cup extends React.Component {
               </div>
             </div>
             <div>
-              <h3 className="typo-cm inline-headline">Current price information (ETH/USD)</h3>
+              <h3 className="typo-cm inline-headline">Current price information (TRX/USD)</h3>
               <TooltipHint tipKey="current-price-information" />
               <div className="value typo-cm right">
                 {
-                  this.props.system.pip.val.gte(0)
+                  this.props.system.pip.val >= 0
                   ?
                     <span>{ printNumber(this.props.system.pip.val) }<span className="unit">USD</span></span>
                   :
@@ -102,9 +102,9 @@ class Cup extends React.Component {
               <TooltipHint tipKey="liquidation-penalty" />
               <div className="value typo-cm right">
                 {
-                  this.props.system.tub.axe.gte(0)
+                  this.props.system.tub.axe >= 0
                   ?
-                    <span>{ printNumber(this.props.system.tub.axe.minus(WAD).times(100)) }<span className="unit">%</span></span>
+                    <span>{ printNumber((this.props.system.tub.axe - WAD) * 100) }<span className="unit">%</span></span>
                   :
                     "Loading..."
                 }
@@ -119,14 +119,14 @@ class Cup extends React.Component {
                 {
                   this.props.system.tub.off === false
                   ?
-                    cup.ratio.lt(0)
+                    cup.ratio<(0)
                     ?
                       "Loading..."
                     :
-                      cup.ratio.gt(0) && cup.ratio.toNumber() !== Infinity
+                      cup.ratio>(0) //&& cup.ratio.toNumber() !== Infinity
                       ?
-                        <span className={ cup.ratio.lt(2) ? (cup.ratio.lt(1.5) ? "text-red" : "text-yellow") : "" }>
-                          { printNumber(toWei(cup.ratio).times(100)) }<span className="unit">%</span>
+                        <span className={ cup.ratio < 2 ? (cup.ratio < 1.5 ? "text-red" : "text-yellow") : "" }>
+                          { printNumber(toWei(cup.ratio)*100) }<span className="unit">%</span>
                         </span>
                       :
                         "-"
@@ -140,10 +140,10 @@ class Cup extends React.Component {
               <TooltipHint tipKey="minimum-ratio" />
               <div className="value typo-cm right">
                 {
-                  this.props.system.tub.mat.gte(0)
+                  this.props.system.tub.mat >= 0
                   ?
                     <span>
-                      { printNumber(this.props.system.tub.mat.times(100)) }<span className="unit">%</span>
+                      { printNumber(this.props.system.tub.mat * 100) }<span className="unit">%</span>
                     </span>
                   :
                     "Loading..."
@@ -155,10 +155,10 @@ class Cup extends React.Component {
               <TooltipHint tipKey="stability-fee" />
               <div className="value typo-cm right">
                 {
-                  this.props.system.tub.fee && this.props.system.tub.fee.gt(0)
+                  this.props.system.tub.fee && this.props.system.tub.fee > 0
                   ?
                     <span>
-                      { printNumber(toWei(fromWei(this.props.system.tub.fee).pow(60 * 60 * 24 * 365)).times(100).minus(toWei(100)), 3, true, true) }<span className="unit">%</span>
+                      { printNumber( (toWei(fromWei(this.props.system.tub.fee)**(60 * 60 * 24 * 365))* 100 ) - (toWei(100)), 3, true, true) }<span className="unit">%</span>
                     </span>
                   :
                     "Loading..."
@@ -169,7 +169,7 @@ class Cup extends React.Component {
         </div>
         <div className="row">
           <div className="col col-2">
-            <h3 className="typo-cl inline-headline">ETH collateral</h3>
+            <h3 className="typo-cl inline-headline">TRX collateral</h3>
 
             <div className="inner-row">
               <h4 className="typo-c inline-headline">Deposited</h4>
@@ -178,14 +178,14 @@ class Cup extends React.Component {
               </div>
               <div className="right align-right" style={ {marginRight: "1rem"} }>
                 {
-                  cup.ink.gte(0) && this.props.system.tub.per.gte(0) && this.props.system.pip.val.gte(0)
+                  cup.ink >(0) && this.props.system.tub.per >(0) && this.props.system.pip.val >(0)
                   ?
                     <React.Fragment>
                       <div className="value block typo-cl">
-                        { printNumber(wmul(cup.ink, this.props.system.tub.per)) }<span className="unit">ETH</span>
+                        { printNumber(wmul(cup.ink, this.props.system.tub.per)) }<span className="unit">TRX</span>
                       </div>
                       <div className="value block typo-c" style={ {lineHeight: "1rem"} }>
-                        { printNumber(cup.ink) }<span className="unit">PETH</span>
+                        { printNumber(cup.ink) }<span className="unit">PTRX</span>
                         <span className="separator">&nbsp;|&nbsp;</span>
                         { printNumber(wmul(wmul(cup.ink, this.props.system.tub.per), this.props.system.pip.val)) }<span className="unit">USD</span>
                       </div>
@@ -210,10 +210,10 @@ class Cup extends React.Component {
                   ?
                     <div className="right align-right" style={ {marginRight: "1rem"} }>
                       <div className="value block typo-cl">
-                        { printNumber(wmul(cup.avail_skr, this.props.system.tub.per)) }<span className="unit">ETH</span>
+                        { printNumber(wmul(cup.avail_skr, this.props.system.tub.per)) }<span className="unit">TRX</span>
                       </div>
                       <div className="value block typo-c" style={ {lineHeight: "1rem"} }>
-                        { printNumber(cup.avail_skr) }<span className="unit">PETH</span>
+                        { printNumber(cup.avail_skr) }<span className="unit">PTRX</span>
                         <span className="separator">&nbsp;|&nbsp;</span>
                         { printNumber(wmul(wmul(cup.avail_skr, this.props.system.tub.per), this.props.system.pip.val)) }<span className="unit">USD</span>
                       </div>
@@ -234,7 +234,7 @@ class Cup extends React.Component {
               </div>
               <div className="right align-right" style={ {marginRight: "1rem"} }>
                 {
-                  this.props.system.tab(cup).gte(0) && this.props.system.vox.par.gte(0)
+                  this.props.system.tab(cup)>(0) && this.props.system.vox.par>(0)
                   ?
                     <React.Fragment>
                       <div className="value block typo-cl">

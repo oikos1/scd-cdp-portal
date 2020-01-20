@@ -95,28 +95,28 @@ class Landing extends React.Component {
               <div className="info-slide">
                 <h1>01.<span className="line"></span>THE CONCEPT</h1>
                 <h2 className="sm">What is a Collateralized Debt Position (CDP)?</h2>
-                <p>A CDP enables the generation of SAI stablecoins against the collateral (currently ETH) that you lock up in the CDP until you pay back the SAI you generated.</p>
+                <p>A CDP enables the generation of SAI stablecoins against the collateral (currently TRX) that you lock up in the CDP until you pay back the SAI you generated.</p>
               </div>
             </div>
             <div>
               <div className="info-slide">
                 <h1>02.<span className="line"></span>THE BENEFITS</h1>
                 <h2>What are the benefits of opening a CDP?</h2>
-                <p>You can get liquidity by generating SAI stablecoins without giving up ownership of your collateral (as long as you make sure that the CDP holds enough collateral to cover the value of the SAI stablecoins). When using ETH as collateral, the value of the locked up collateral must always be more than 150% of the amount of SAI stablecoins that you generate.</p>
+                <p>You can get liquidity by generating SAI stablecoins without giving up ownership of your collateral (as long as you make sure that the CDP holds enough collateral to cover the value of the SAI stablecoins). When using TRX as collateral, the value of the locked up collateral must always be more than 150% of the amount of SAI stablecoins that you generate.</p>
               </div>
             </div>
             <div>
               <div className="info-slide">
                 <h1>03.<span className="line"></span>THE SETUP</h1>
                 <h2>How does it work?</h2>
-                <p>You determine how much ETH you want to lock up in the CDP. You generate SAI stablecoins against the ETH you locked up, and spend them as you wish. You pay back the SAI stablecoins when you no longer need the liquidity, together with a stability fee, and then you can withdraw the collateral that you locked up.</p>
+                <p>You determine how much TRX you want to lock up in the CDP. You generate SAI stablecoins against the TRX you locked up, and spend them as you wish. You pay back the SAI stablecoins when you no longer need the liquidity, together with a stability fee, and then you can withdraw the collateral that you locked up.</p>
               </div>
             </div>
             <div>
               <div className="info-slide">
                 <h1>04.<span className="line"></span>THE RISKS</h1>
                 <h2>Is there any risk involved in creating a CDP?</h2>
-                <p>As long as you monitor your CDP and make sure that the value of the locked up ETH is always more than 150% of the SAI stablecoins that you have generated, your CDP will not be liquidated. If the value of the collateral comes close to 150% you can add more collateral, or pay back some of the debt. If the value of the locked up collateral falls below 150% then your CDP will be liquidated. This means that your collateral is being sold by the system in order to cover the value of the Sai stablecoins that you generated. Any leftover collateral is returned to your CDP so you can withdraw it. See the <Link to="/terms">Terms of Service</Link> for risks involved.</p>
+                <p>As long as you monitor your CDP and make sure that the value of the locked up TRX is always more than 150% of the SAI stablecoins that you have generated, your CDP will not be liquidated. If the value of the collateral comes close to 150% you can add more collateral, or pay back some of the debt. If the value of the locked up collateral falls below 150% then your CDP will be liquidated. This means that your collateral is being sold by the system in order to cover the value of the Sai stablecoins that you generated. Any leftover collateral is returned to your CDP so you can withdraw it. See the <Link to="/terms">Terms of Service</Link> for risks involved.</p>
               </div>
             </div>
             <div>

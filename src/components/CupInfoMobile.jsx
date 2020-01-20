@@ -138,7 +138,7 @@ class CupInfoMobile extends Component {
           </div>
           <div>
             <h3 className="typo-cm typo-bold inline-headline">
-              Liquidation price (ETH/USD)
+              Liquidation price (TRX/USD)
             </h3>
             <div className="typo-cm right">
               {
@@ -150,7 +150,7 @@ class CupInfoMobile extends Component {
           </div>
           <div>
             <h3 className="typo-cm typo-bold inline-headline">
-              Current price (ETH/USD)
+              Current price (TRX/USD)
             </h3>
             <div className="typo-cm right">
               { printNumber(this.props.system.pip.val) } USD

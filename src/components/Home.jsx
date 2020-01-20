@@ -67,12 +67,14 @@ class Home extends React.Component {
               {
                 !this.props.network.isConnected || !this.props.network.defaultAccount
                 ?
-                  <Landing />
+
+                <Landing />
+                
                 :
                   <React.Fragment>
                     {
                       this.props.system.tub.cupsLoading
-                      ?
+                     ?
                         <div>Loading...</div>
                       :
                         this.state.migrateCDP
@@ -104,21 +106,20 @@ class Home extends React.Component {
               {
                 <div className="right-column-content">
                   {
-                    this.props.network.loadingAddress
+                    !this.props.network.loadingAddress
+
                     ?
-                      <div style={ {padding: "1.7em 3.38em"} }>
-                        {
-                          this.props.network.waitingForAccessApproval
-                          ?
-                            <React.Fragment>
-                              Waiting for approval to access to your account...
-                            </React.Fragment>
-                          :
-                            <React.Fragment>
-                              Loading...
+                           <React.Fragment>
+                            <Wallet />
+                              <center>  
+                                {
+                                  this.props.network.defaultAccount &&
+                                  <SystemInfo />
+                                }
+                                </center>
                               {
-                                this.props.transactions.amountCheck > 4 &&
-                                <React.Fragment>
+                                this.props.transactions.amountCheck > 4 
+                                   && <React.Fragment>
                                   &nbsp;Node is momentarily out of sync.<br />
                                   If it takes longer,&nbsp;
                                   {
@@ -132,14 +133,14 @@ class Home extends React.Component {
                                     :
                                       "please try refreshing the page."
                                   }
+
                                 </React.Fragment>
+                              
                               }
                             </React.Fragment>
-                        }
-                      </div>
                     :
                       <React.Fragment>
-                        <Wallet />
+                        
                         {
                           this.props.network.defaultAccount &&
                           <SystemInfo />
@@ -147,6 +148,7 @@ class Home extends React.Component {
                       </React.Fragment>
                   }
                   <div className="footer col col-no-border typo-cs typo-grid-grey">
+
                     {
                       !this.props.network.loadingAddress &&
                         <React.Fragment>

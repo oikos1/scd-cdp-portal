@@ -4,6 +4,7 @@ import * as Web3ProviderEngine from "web3-provider-engine/dist/es5";
 import * as RpcSource from "web3-provider-engine/dist/es5/subproviders/rpc";
 import Transport from "@ledgerhq/hw-transport-u2f";
 import checkIsMobile from "ismobilejs";
+import tronWeb, { initTronweb }  from "../utils/tronweb";
 
 // Utils
 import LedgerSubProvider from "./ledger-subprovider";
@@ -13,7 +14,7 @@ import TrezorSubProvider from "./trezor-subprovider";
 import * as settings from "../settings";
 
 export const getWebClientProviderName = () => {
-  if (window.imToken)
+  /*if (window.imToken)
     return "imtoken";
 
   if (window.ethereum && window.ethereum.isStatus)
@@ -61,11 +62,14 @@ export const getWebClientProviderName = () => {
   if (window.web3.currentProvider.host && window.web3.currentProvider.host.indexOf("localhost") !== -1)
     return "localhost";
 
-  return "other";
+  return "other";*/
+  //if (window.tronWeb !== undefined) 
+    //initTronweb(window.tronweb);
+    return "tronweb";
 };
 
 class Web3Extended extends Web3 {
-  stop = () => {
+  stop = () => {  
     this.reset();
     if (this.currentProvider && typeof this.currentProvider.stop === "function") {
       this.currentProvider.stop();
@@ -93,48 +97,105 @@ class Web3Extended extends Web3 {
     });
   }
 
+
   setWebClientWeb3 = (specificProvider = null) => {
+    this.stop();
+    return new Promise(async (resolve, reject) => {
+            const tronWebState = {
+                installed: !!window.tronWeb,
+                loggedIn: window.tronWeb && window.tronWeb.ready
+            };
+
+            if(tronWebState.installed) {
+                //this.setState({
+                //    tronWeb:
+                //    tronWebState
+                //});
+                var provider = window.tronWeb;
+                console.log(window.tronWeb);
+                
+                resolve(provider);
+            } else {
+              console.log("Pleae install tronlink extension to use Dapp functionality")
+              reject(new Error("No client"));  
+            }
+        });
+    }
+
+
+  /*_setWebClientWeb3 = (specificProvider = null) => {
     this.stop();
     return new Promise(async (resolve, reject) => {
       try {
         if (specificProvider) {
           try {
-            if (typeof specificProvider.enable === 'function') {
-              await specificProvider.enable();
-            }
-            resolve(specificProvider);
+            //if (typeof specificProvider.enable === 'function') {
+              //await specificProvider.enable();
+            //}
+            //resolve(specificProvider);
+            if (window.tronWeb !== undefined) {
+
+                if (!window.tronWeb) {
+                  const HttpProvider = window.tronWeb.providers.HttpProvider;
+                  const fullNode = new HttpProvider('https://api.trongrid.io');
+                  const solidityNode = new HttpProvider('https://api.trongrid.io');
+                  const eventServer = 'https://api.trongrid.io/';
+                  
+                  const tronWeb = new  window.tronWeb(
+                      fullNode,
+                      solidityNode,
+                      eventServer,
+                  );
+
+                  window.tronWeb = tronWeb;
+                  var provider = window.tronWeb;
+                  console.log(provider)
+                  resolve(provider);
+                }
+
+            } else {
+              console.log("Pleae install tronlink extension to use Dapp functionality")
+              reject(new Error("No client"));          
+            } 
+
+
+
+
           } catch (error) {
             reject(new Error("User denied account access"));
           }
-        } else if (window.web3 || window.ethereum) {
+        } /*else if (window.web3 || window.ethereum) {
           try {
             let provider;
             if (window.ethereum) {
-              await window.ethereum.enable();
-              provider = window.ethereum;
+              //await window.ethereum.enable();
+              //provider = window.ethereum;
             } else {
-              provider = window.web3.currentProvider;
+              //provider = window.web3.currentProvider;
             }
-            resolve(provider);
+            //resolve(provider);
           } catch (error) {
             reject(new Error("User denied account access"));
           }
         } else {
           reject(new Error("No client"));
-        }
-      } catch(e) {
-        reject(e);
-      }
-    });
-  }
+        }*/
+       
+      //} catch(e) {
+      //  reject(e);
+     // }
+  //  });
+//  }
 
   setWebClientProvider = provider => {
     return new Promise(async (resolve, reject) => {
       try {
         this.setProvider(provider);
+        console.log("swcp : " , provider);
         this.useLogs = false;
         window.activeProvider = provider;
         this.currentProvider.name = getWebClientProviderName();
+        console.log(this.currentProvider.name)
         resolve(true);
       } catch (error) {
         reject(new Error("Error setting provider"));

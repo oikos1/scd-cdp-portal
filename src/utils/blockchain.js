@@ -1,6 +1,7 @@
 // Libraries
 import Promise from "bluebird";
 import checkIsMobile from "ismobilejs";
+//import tronWeb, { initTronweb } from 'tronweb';
 
 // Utils
 import web3 from "./web3";
@@ -9,6 +10,7 @@ import BigNumber from 'bignumber.js';
 
 const promisify = Promise.promisify;
 const schema = {};
+const _address = 'TXE6D2uwSTMhr5s3sVxgJjL7jyoFSqb5eB';
 
 schema.tub = require("../abi/saitub");
 schema.top = require("../abi/saitop");
@@ -21,30 +23,118 @@ schema.dstoken = require("../abi/dstoken");
 schema.dsvalue = require("../abi/dsvalue");
 schema.saiProxyCreateAndExecute = require("../abi/saiProxyCreateAndExecute");
 schema.saivaluesaggregator = require("../abi/saivaluesaggregator");
+const CryptoUtils = require("@tronscan/client/src/utils/crypto");
+
+function hexStr2byteArray(str) {
+  var byteArray = Array();
+  var d = 0;
+  var j = 0;
+  var k = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    var c = str.charAt(i);
+    if (isHexChar(c)) {
+      d <<= 4;
+      d += hexChar2byte(c);
+      j++;
+      if (0 === (j % 2)) {
+        byteArray[k++] = d;
+        d = 0;
+      }
+    }
+  }
+  return byteArray;
+}
+
+/* Check if a char is hex char */
+function isHexChar(c) {
+  if ((c >= 'A' && c <= 'F') ||
+      (c >= 'a' && c <= 'f') ||
+      (c >= '0' && c <= '9')) {
+    return 1;
+  }
+  return 0;
+}
+/* Convert a hex char to value */
+function hexChar2byte(c) {
+  var d = 0;
+  if (c >= 'A' && c <= 'F') {
+    d = c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+  }
+  else if (c >= 'a' && c <= 'f') {
+    d = c.charCodeAt(0) - 'a'.charCodeAt(0) + 10;
+  }
+  else if (c >= '0' && c <= '9') {
+    d = c.charCodeAt(0) - '0'.charCodeAt(0);
+  }
+  return d;
+}
 
 
 export const objects = {
 }
-
+ 
 export const getAccounts = () => {
   return promisify(web3.eth.getAccounts)();
 }
 
-export const loadObject = (type, address, label = null) => {
-  const object = web3.eth.contract(schema[type].abi).at(address);
-  if (label) {
-    objects[label] = object;
-  }
-  return object;
+const loadArtifact = name => {
+    let data = require(`../abi/${name}.json`);
+    return data;
+};
+
+export  const  loadObject = async (type, address, label = null) => {
+    if (address !== null) {
+      try {
+        //console.log("getting contract: " + CryptoUtils.getBase58CheckAddress(   hexStr2byteArray(address) ));
+        const object = await window.tronWeb.contract().at(address);
+        if (label) {
+          objects[label] = object;
+        }
+        return object;
+      } catch (e) {
+        console.log(e)
+      }
+      return;
+    }
 }
 
+export const deployContract = async (tW, name, ...args) => {
+    const Contract = loadArtifact(name);
+
+    console.log("Contract", Contract, "deploying from account", window.tronWeb.defaultAddress.base58 )
+
+    //setDefaultAccount(window.tronWeb.defaultAddress.base58);
+    //window.tronWeb.setAddress(window.tronWeb.defaultAddress.base58);
+
+    const contractInstance = await tW.contract().new({
+        abi: Contract.abi,
+        bytecode: Contract.bytecode,
+        feeLimit: 1000000000,
+        callValue: 0,
+        userFeePercentage: 100,
+        parameters: args,
+    });
+
+    const address = window.tronWeb.address.fromHex(contractInstance.address);
+    console.log(
+        `Contract ${name} Deployed: address: ${address}, hexAddress: ${contractInstance.address}`
+    );
+    return contractInstance;
+};
+
 export const setDefaultAccount = account => {
-  web3.eth.defaultAccount = account;
-  console.debug(`Address ${account} loaded`);
+  //web3.eth.defaultAccount = account;
+  window.tronWeb.defaultAddress = {
+      hex: window.tronWeb.address.toHex(account),
+      base58:account
+  };   
+  console.log(`Address ${account} loaded`);
 }
 
 export const getDefaultAccount = () => {
-  return typeof web3.eth.defaultAccount !== "undefined" ? web3.eth.defaultAccount : null;
+  return typeof window.tronWeb.defaultAddress !== "undefined" ? window.tronWeb.defaultAddress : null; 
+  //return typeof web3.eth.defaultAccount !== "undefined" ? web3.eth.defaultAccount : null;
 }
 
 export const getDefaultAccountByIndex = index => {
@@ -74,8 +164,11 @@ export const getTransaction = tx => {
   return promisify(web3.eth.getTransaction)(tx);
 }
 
-export const getTransactionReceipt = tx => {
-  return promisify(web3.eth.getTransactionReceipt)(tx);
+export const getTransactionReceipt = async (tx) => {
+  //return promisify(web3.eth.getTransactionReceipt)(tx);
+  let ret = await window.tronWeb.trx.getTransaction(tx) 
+  //console.log("returned", ret);
+  return ret  ;
 }
 
 export const getTransactionCount = address => {
@@ -206,18 +299,47 @@ export const setHWProvider = (device, network, path, accountsOffset = 0, account
 }
 
 export const setWebClientWeb3 = (specificProvider = null) => {
-  return web3.setWebClientWeb3(specificProvider);
+
+  console.log("SP : ", specificProvider);
+  //if (specificProvider !== null) {
+      return web3.setWebClientWeb3(specificProvider);
+
+  //} else {
+  ////  console.log("err sp provider");
+    return;
+  //}
 }
 
 export const setWebClientProvider = provider => {
+  console.log("SWCP :", provider);
   return web3.setWebClientProvider(provider);
 }
 
 export const { getWebClientProviderName } = require("./web3");
 
-export const checkNetwork = (actualIsConnected, actualNetwork) => {
-  return new Promise((resolve, reject) => {
-    let isConnected = null;
+//export const checkNetwork = (actualIsConnected, actualNetwork) => {
+export const checkNetwork = () => {
+  return new Promise( async (resolve, reject) => {
+
+    let isConnected = await window.tronWeb.isConnected();
+    let latestBlock = await window.tronWeb.trx.getCurrentBlock();
+    latestBlock = latestBlock.block_header.raw_data.number;
+
+    console.log("isTronConnected", isConnected, "latestBlock", latestBlock);
+
+    if (isConnected)
+      resolve({
+        status: 1,
+        data: {
+          network: "main",
+          isConnected: true,
+          latestBlock: latestBlock
+          }
+      })
+    else
+      reject("Tronweb not connected");
+
+/*    let isConnected = null;
     getNode().then(r => {
       isConnected = true;
     }, () => {
@@ -235,8 +357,8 @@ export const checkNetwork = (actualIsConnected, actualNetwork) => {
                 network = "main";
                 break;
               default:
-                console.debug("setting network to private");
-                console.debug("res.hash:", res.hash);
+                console.log("setting network to private");
+                console.log("res.hash:", res.hash);
                 network = "private";
             }
             if (actualNetwork !== network) {
@@ -272,7 +394,7 @@ export const checkNetwork = (actualIsConnected, actualNetwork) => {
           });
         }
       }
-    }, e => reject(e));
+    }, e => reject(e));*/
   });
 }
 
@@ -280,29 +402,34 @@ export const checkNetwork = (actualIsConnected, actualNetwork) => {
 // always returns mainet info
 export async function getStabilityFee() {
   const { nodeURL, tub } = settings.chain.main;
-  const rawResponse = await fetch(nodeURL, {
+  var _nodeURL = ""
+  const rawResponse = await fetch('http://192.168.0.102:9090/wallet/triggersmartcontract', {
     method: 'POST',
+    url: 'http://192.168.0.102:9090/wallet/triggersmartcontract',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      jsonrpc: '2.0',
-      method: 'eth_call',
-      params: [
-        {
-          to: tub,
-          data: "0xddca3f43" // keccak("fee()")
-        },
-        'latest'
-      ],
-      id: 1
+      owner_address: window.tronWeb.defaultAddress.hex,
+      contract_address: window.tronWeb.address.toHex(settings.chain["main"].tub),
+      parameter: null,
+      function_selector: "fee()",
+      fee_limit:"1000000",
+      call_value:0
     })
   });
 
   const RAY = new BigNumber('1e27');
-  const feeHex = (await rawResponse.json()).result;
-  const baseBigNumber = new BigNumber(feeHex).div(RAY);
+  const feeHex = (await rawResponse.json());
+  let baseBigNumber = 0;
+
+  if (typeof feeHex.constant_result !== "undefined")
+     baseBigNumber = new BigNumber(web3.toBigNumber("0x" + feeHex.constant_result[0].toString() )).div(RAY); 
+  else
+     baseBigNumber = new BigNumber("0").div(RAY)
+  //console.log(feeHex);
+
   const secondsPerYear = 60 * 60 * 24 * 365;
   BigNumber.config({ POW_PRECISION: 100 });
   return baseBigNumber
@@ -314,3 +441,6 @@ export async function getStabilityFee() {
 export const isMobileWeb3Wallet = () => {
   return checkIsMobile.any && (window.web3 || window.ethereum);
 };
+
+
+ 

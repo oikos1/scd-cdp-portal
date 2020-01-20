@@ -12,13 +12,14 @@ class SystemInfo extends React.Component {
   render() {
     return (
       <React.Fragment>
+
         <div className="col col-2-m active-network-section">
-          <p className="typo-c align-center"><span className={ this.props.network.network === "main" ? "green-dot" : "purple-dot" }></span>{ this.props.network.network === "main" ? "Main Ethereum" : capitalize(this.props.network.network) + " Test" } Network</p>
+          <p className="typo-c align-center"><span className={ this.props.network.network === "main" ? "green-dot" : "purple-dot" }></span>{ this.props.network.network === "main" ? "Main Tron" : capitalize(this.props.network.network) + " Test" } Network</p>
         </div>
         <div className="col col-2-m info-section">
           <div className="price-info">
             <h2 className="typo-h2">Price Info</h2>
-            <h3 className="typo-c">ETH/USD</h3>
+            <h3 className="typo-c">1 - TRX/USD</h3>
             <div className="value">
               {
                 this.props.system.pip.val && this.props.system.pip.val.gt(0)
@@ -28,12 +29,12 @@ class SystemInfo extends React.Component {
                   <span>Loading...</span>
               }
             </div>
-            <h3 className="typo-c">PETH/ETH</h3>
+            <h3 className="typo-c">PTRX/TRX</h3>
             <div className="value">
               {
                 this.props.system.tub.per.gte(0)
                 ?
-                  <span><span>{ printNumber(this.props.system.tub.per) }</span><span className="unit">ETH</span></span>
+                  <span><span>{ printNumber(this.props.system.tub.per) }</span><span className="unit">TRX</span></span>
                 :
                   <span>Loading...</span>
               }

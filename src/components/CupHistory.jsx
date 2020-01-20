@@ -70,15 +70,15 @@ class CupHistory extends React.Component {
                             image = historyIconGive;
                             break;
                           case "LOCK":
-                            message = <React.Fragment>Deposited {printNumber(toWei(action.arg * action.per))} ETH ({printNumber(toWei(action.arg))} PETH) to your CDP</React.Fragment>;
+                            message = <React.Fragment>Deposited {printNumber(action.arg * action.per)} TRX ({printNumber(action.arg)} PTRX) to your CDP</React.Fragment>;
                             image = historyIconLocked;
                             break;
                           case "FREE":
-                            message = <React.Fragment>Withdrew {printNumber(toWei(action.arg * action.per))} ETH ({printNumber(toWei(action.arg))} PETH) from your CDP</React.Fragment>;
+                            message = <React.Fragment>Withdrew {printNumber(toWei(action.arg * action.per))} TRX ({printNumber(toWei(action.arg))} PTRX) from your CDP</React.Fragment>;
                             image = historyIconPayback;
                             break;
                           case "DRAW":
-                            message = <React.Fragment>Generated {printNumber(toWei(action.arg))} SAI from your CDP</React.Fragment>;
+                            message = <React.Fragment>Generated {printNumber(action.arg)} SAI from your CDP</React.Fragment>;
                             image = historyIconBorrow;
                             break;
                           case "WIPE":
@@ -96,7 +96,7 @@ class CupHistory extends React.Component {
                             const pip = toWei(this.props.history[key].pip);
                             message = <React.Fragment>
                                         Your CDP has been liquidated to pay back { printNumber(art, 2) } SAI.
-                                        Total {printNumber(liqETH)} ETH ({ printNumber(liqInk) } PETH) has been liquidated at { printNumber(pip, 2) } USD.
+                                        Total {printNumber(liqETH)} TRX ({ printNumber(liqInk) } PTRX) has been liquidated at { printNumber(pip, 2) } USD.
                                       </React.Fragment>;
                             image = historyIconLiquidation;
                             break;

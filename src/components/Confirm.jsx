@@ -35,7 +35,7 @@ class Confirm extends Component {
             <div className="col col-2">
               <div>
                 <h3 className="typo-cl inline-headline">Collateral:</h3>
-                <div className="value typo-cl typo-bold right">{ printNumber(eth) } ETH</div>
+                <div className="value typo-cl typo-bold right">{ printNumber(eth) } TRX</div>
               </div>
             </div>
             <div className="col col-2">

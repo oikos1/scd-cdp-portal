@@ -54,7 +54,7 @@ class Wallet extends React.Component {
     window.location = '/';
   }
 
-  tokenName = token => token.replace("gov", "mkr").replace("dai", "sai").toUpperCase();
+  tokenName = token => token.replace("gov", "oik").replace("dai", "sai").replace("eth", "trx").toUpperCase();
 
   renderWalletOptions = () => {
     const options = [];
@@ -83,7 +83,11 @@ class Wallet extends React.Component {
 
   render() {
     const tokens = {
+      //
+      //this.props.system.dai.myBalance
+      //this.props.system.gov.myBalance
       "eth": {"balance": this.props.system.eth.myBalance, "usdPrice": this.props.system.pip.val, "allowance": false},
+      "wtrx":{"balance": this.props.system.gem.myBalance, "usdPrice": this.props.system.pip.val, "allowance": false},     
       "dai": {"balance": this.props.system.dai.myBalance, "usdPrice": this.props.system.vox.par, "allowance": false},
       "gov": {"balance": this.props.system.gov.myBalance, "usdPrice": this.props.system.pep.val, "allowance": false}
     };
@@ -165,6 +169,8 @@ class Wallet extends React.Component {
                             <tbody>
                               {
                                 Object.keys(tokens).map(token =>
+                                  //if (token.name=="eth")
+
                                   <tr key={ token }>
                                     <td>
                                       { this.tokenName(token) }
@@ -172,7 +178,7 @@ class Wallet extends React.Component {
                                     </td>
                                     <td>
                                       {
-                                        tokens[token].balance.eq(-1) || tokens[token].usdPrice.eq(-1)
+                                        tokens[token].balance <= -1 || tokens[token].usdPrice <= -1
                                         ?
                                           "Loading..."
                                         :
@@ -192,7 +198,7 @@ class Wallet extends React.Component {
                                     <td>
                                       {
                                         token !== "eth" &&
-                                        <ToggleSwitch enabled={ !this.props.system[token].allowance.eq(-1) } onClick={ e => { e.preventDefault(); this.props.system.checkProxyAndSetAllowance(token, !this.props.system[token].allowance.eq(BIGGESTUINT256)) } } on={ this.props.system[token].allowance.eq(BIGGESTUINT256) } pending={ this.props.transactions.loading.changeAllowance && this.props.transactions.loading.changeAllowance[token] } />
+                                        <ToggleSwitch enabled={ !this.props.system[token].allowance<=-1 } onClick={ e => { e.preventDefault(); this.props.system.checkProxyAndSetAllowance(token, !this.props.system[token].allowance == BIGGESTUINT256) } } on={ this.props.system[token].allowance == BIGGESTUINT256 } pending={ this.props.transactions.loading.changeAllowance && this.props.transactions.loading.changeAllowance[token] } />
                                       }
                                     </td>
                                   </tr>

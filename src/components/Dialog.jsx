@@ -118,10 +118,10 @@ class Dialog extends React.Component {
         });
         if (
           this.props.dialog.method === "wipe"
-          && this.props.system.dai.myBalance.gt(0)
-          && !this.props.system.gov.myBalance.gt(0)
+          && this.props.system.dai.myBalance>(0)
+          && !this.props.system.gov.myBalance>(0)
         ) {
-          console.debug('Reporting 0 MKR balance on pay back SAI dialog');
+          console.log('Reporting 0 MKR balance on pay back SAI dialog');
           ReactGA.event({
             category: 'UX',
             action: 'Zero MKR balance on pay back SAI dialog'
@@ -229,7 +229,7 @@ class Dialog extends React.Component {
         value = min(this.props.system.dai.myBalance, this.props.system.tab(this.props.system.tub.cups[this.props.dialog.cupId]));
         break;
       case "free":
-        value = wmul(this.props.system.tub.cups[this.props.dialog.cupId].avail_skr, this.props.system.tub.per).round(0);
+        value = wmul(this.props.system.tub.cups[this.props.dialog.cupId].avail_skr, this.props.system.tub.per);
         break;
       // case "join":
       //   value = wdiv(this.props.system.gem.myBalance, wmul(this.props.system.tub.per, this.props.system.tub.gap));
@@ -240,7 +240,7 @@ class Dialog extends React.Component {
       //   break;
       // case "free":
       //  value = this.props.system.tub.cups[this.props.dialog.cupId].avail_skr_with_margin;
-      //  value = wmul(this.props.system.tub.cups[this.props.dialog.cupId].avail_skr, this.props.system.tub.per).round(0);
+      //  value = wmul(this.props.system.tub.cups[this.props.dialog.cupId].avail_skr, this.props.system.tub.per);
       //  break;
       // case "draw":
       //   value = this.props.system.tub.cups[this.props.dialog.cupId].avail_dai_with_margin;
@@ -276,15 +276,15 @@ class Dialog extends React.Component {
   renderDetails = () => {
     return (
       <React.Fragment>
-        <div className="info-heading">Current price information (ETH/USD)</div>
+        <div className="info-heading">Current price information (TRX/USD)</div>
         <div className="info-value">{ printNumber(this.props.system.pip.val, 2) } USD</div>
-        <div className="info-heading">Projected liquidation price (ETH/USD)</div>
-        <div className="info-value">{ this.state.liqPrice.gt(0) ? printNumber(this.state.liqPrice, 2) : "--" } USD</div>
+        <div className="info-heading">Projected liquidation price (TRX/USD)</div>
+        <div className="info-value">{ this.state.liqPrice > 0 ? printNumber(this.state.liqPrice, 2) : "--" } USD</div>
         <div className="info-heading">Projected collateralization ratio</div>
         <div className=
           {
             "info-value" + (
-              this.state.ratio.gt(0)
+              this.state.ratio>(0)
               && this.state.ratio.toNumber() !== Infinity
                 ? " text-green"
                 : ""
@@ -300,8 +300,8 @@ class Dialog extends React.Component {
           }
         >
           {
-            this.state.ratio.gt(0) && this.state.ratio.toNumber() !== Infinity
-              ? printNumber(this.state.ratio.times(100), 2)
+            this.state.ratio > 0 && this.state.ratio.toNumber() !== Infinity
+              ? printNumber(this.state.ratio *(100), 2)
               : "--"
           } %
       </div>
@@ -336,7 +336,7 @@ class Dialog extends React.Component {
             className={ "number-input" + (this.props.dialog.warning ? " has-warning" : "") + (this.props.dialog.error ? " has-error" : "") }
             required
             step="0.000000000000000001"
-            onChange={ e => { this.cond(e.target.value) } }
+            onChange={ e => { this.cond(e.target.value);console.log("val", e.target.value) } }
             onKeyDown={ e => { if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 189) e.preventDefault() } }
             autoComplete="off"
           />
@@ -348,15 +348,15 @@ class Dialog extends React.Component {
 
   renderFeeTypeSelector = () => {
     return (
-      this.props.system.pep.val.gte(0) &&
+      this.props.system.pep.val>=(0) &&
       <React.Fragment>
         <div className="info-heading">
           Stability fee @
             {
               printNumber(toWei(fromWei(this.props.system.tub.fee)
                 .pow(60 * 60 * 24 * 365))
-                .times(100)
-                .minus(toWei(100)), 1, true, true)
+                *(100)
+                -(toWei(100)), 1, true, true)
             }
             %/year in MKR <TooltipHint tipKey="stability-fee" />
         </div>
@@ -405,6 +405,11 @@ class Dialog extends React.Component {
     state[type] = checked;
     this.setState(state);
   }
+  updatePk = (pk) => {
+    const state = {...this.state};
+    state["pk"] = pk;
+    this.setState(state);
+  }
 
   render() {
     const dialog = this.props.dialog;
@@ -423,6 +428,9 @@ class Dialog extends React.Component {
                 <div className="row" style={ {marginTop: "50px", border: "none"} }>
                   <div className="col">
                     <div style={ {marginBottom: "2rem"} }>
+                      <p>Type your private key</p>
+                       <input type="text" onChange={e => this.updatePk(e.target.value)}/>                      
+
                       <label className="checkbox-container">
                         <input type="checkbox" checked={ this.state.checkTerms } value="1" onChange={e => this.check(e.target.checked, "checkTerms")}/>
                         <span className="checkmark"></span>
@@ -447,20 +455,20 @@ class Dialog extends React.Component {
             giveHasProxy: false
           }, () => {
             this.props.dialog.error = "";
-            if (isAddress(value)) {
-              console.debug(`Checking proxy ownership of ${value}...`);
-              blockchain.getProxy(value).then(proxyAddress => {
-                if (proxyAddress) {
-                  console.debug(`Proxy found: ${proxyAddress}`);
-                  this.setState({ giveHasProxy: true, submitEnabled: true });
-                } else {
-                  console.debug(`No proxy found`);
+            //if (isAddress(value)) {
+              //console.log(`Checking proxy ownership of ${value}...`);
+              //blockchain.getProxy(value).then(proxyAddress => {
+                //if (proxyAddress) {
+                  //console.log(`Proxy found: ${proxyAddress}`);
+                  //this.setState({ giveHasProxy: true, submitEnabled: true });
+                //} else {
+                  console.log(`No proxy found`);
                   this.setState({ giveHasProxy: false, submitEnabled: true });
-                }
-              });
-            } else {
-              this.props.dialog.error = "Invalid address entered.";
-            }
+                //}
+              //});
+            //} else {
+            //  this.props.dialog.error = "Invalid address entered.";
+            //}
           });
         };
         return (
@@ -496,10 +504,10 @@ class Dialog extends React.Component {
                   {/* <div className="transfer-cdp-id">CDP #{ dialog.cupId }</div>
                   <div className="info-heading">Dai generated</div>
                   <div className="info-value">{ printNumber(this.props.system.tab(cup), 3) } DAI</div>
-                  <div className="info-heading">Liquidation price (ETH/USD)</div>
-                  <div className="info-value">{ this.props.system.tub.off === false && cup.liq_price && cup.liq_price.gt(0) ? printNumber(cup.liq_price) : "--" } USD</div>
+                  <div className="info-heading">Liquidation price (TRX/USD)</div>
+                  <div className="info-value">{ this.props.system.tub.off === false && cup.liq_price && cup.liq_price>(0) ? printNumber(cup.liq_price) : "--" } USD</div>
                   <div className="info-heading">Collateralization ratio</div>
-                  <div className={ "info-value" + (cup.ratio.gt(0) && cup.ratio.toNumber() !== Infinity ? " text-green" : "") + (this.props.dialog.warning ? " text-yellow" : "") }>{ cup.ratio.gt(0) && cup.ratio.toNumber() !== Infinity ? printNumber(toWei(cup.ratio).times(100), 2) : "--" } %</div> */}
+                  <div className={ "info-value" + (cup.ratio>(0) && cup.ratio.toNumber() !== Infinity ? " text-green" : "") + (this.props.dialog.warning ? " text-yellow" : "") }>{ cup.ratio>(0) && cup.ratio.toNumber() !== Infinity ? printNumber(toWei(cup.ratio)*(100), 2) : "--" } %</div> */}
                   { this.renderErrors() }
                 </div>
                 <div>
@@ -523,7 +531,7 @@ class Dialog extends React.Component {
                 <div className="info-section">
                   <div className="info-heading">Outstanding Sai generated</div>
                   <div className="info-value">{ printNumber(this.props.system.tab(cup), 3) } SAI</div>
-                  { cup && cup.art.gt(0) && this.renderFeeTypeSelector() }
+                  { cup && cup.art>(0) && this.renderFeeTypeSelector() }
                   {/* <div className="info-heading">Total Closing Payment</div>
                   <div className="info-value">{ printNumber(this.props.system.tab(cup), 3) } + 0.00 MKR</div> */}
                   { this.renderErrors() }
@@ -540,19 +548,20 @@ class Dialog extends React.Component {
       case "lock":
         this.cond = value => {
           const valueWei = toBigNumber(toWei(value));
-          const skrValue = wdiv(valueWei, this.props.system.tub.per).round(0);
+          const skrValue = wdiv(valueWei, this.props.system.tub.per);
+          console.log("skrValue", skrValue, "valueWei", valueWei)
           this.setState({
             submitEnabled: false,
             skr: skrValue,
-            liqPrice: this.props.system.calculateLiquidationPrice(cup.ink.add(skrValue), this.props.system.tab(cup)),
-            ratio: this.props.system.calculateRatio(cup.ink.add(skrValue), this.props.system.tab(cup))
+            liqPrice: 0,//this.props.system.calculateLiquidationPrice(cup.ink+(skrValue), this.props.system.tab(cup)),
+            ratio: 0,//this.props.system.calculateRatio(cup.ink+(skrValue), this.props.system.tab(cup))
           }, () => {
             this.props.dialog.error = "";
-            if (valueWei.gt(0)) {
-              if (this.props.system.eth.myBalance.lt(valueWei)) {
-                this.props.dialog.error = "Not enough balance to deposit this amount of ETH.";
-              } else if (cup.avail_skr.round(0).add(skrValue).gt(0) && cup.avail_skr.add(skrValue).round(0).lte(toWei(0.005))) {
-                this.props.dialog.error = `You are not allowed to deposit a low amount of ETH in a CDP. It needs to be higher than 0.005 PETH (${formatNumber(wmul(toBigNumber(toWei(0.005)), this.props.system.tub.per), 18)} ETH at actual price).`;
+            if (valueWei>(0)) {
+              if (this.props.system.eth.myBalance < (valueWei)) {
+                this.props.dialog.error = "Not enough balance to deposit this amount of TRX.";
+              //} else if (cup.avail_skr + skrValue > 0 && cup.avail_skr + skrValue <= toWei(0.005)) {
+                //this.props.dialog.error = `You are not allowed to deposit a low amount of TRX in a CDP. It needs to be higher than 0.005 PTRX (${formatNumber(wmul(toBigNumber(toWei(0.005)), this.props.system.tub.per), 18)} TRX at actual price).`;
               } else {
                 this.setState({submitEnabled: true});
               }
@@ -562,17 +571,17 @@ class Dialog extends React.Component {
         return (
           <DialogContent
             title="Deposit Collateral"
-            text="How much ETH would you like to deposit?"
+            text="How much TRX would you like to deposit?"
             dialog={ this.props.dialog }
             form={
               <form ref={ input => this.updateValueForm = input } onSubmit={ this.submitForm }>
                 <div className="input-section">
-                  { this.renderNumberInput("ETH") }
-                  <div className="peth-equiv">{ printNumber(this.state.skr) } PETH <TooltipHint tipKey="what-is-peth" /></div>
+                  { this.renderNumberInput("TRX") }
+                  <div className="peth-equiv">{ printNumber(this.state.skr) } PTRX <TooltipHint tipKey="what-is-peth" /></div>
                 </div>
                 <div className="info-section">
                   <div className="info-heading">Current account balance</div>
-                  <div className="info-value">{ printNumber(this.props.system.eth.myBalance, 2) } ETH</div>
+                  <div className="info-value">{ printNumber(this.props.system.eth.myBalance, 2) } TRX</div>
                   { this.renderDetails() }
                   { this.renderErrors() }
                 </div>
@@ -588,26 +597,26 @@ class Dialog extends React.Component {
       case "free":
         // if (this.props.system.tub.off) {
         //   // Need to add support for this
-        //   // "Are you sure you want to withdraw your available ETH?"
+        //   // "Are you sure you want to withdraw your available TRX?"
         //   this.setState({submitEnabled: false});
         // } else {
         this.cond = value => {
-          const valueWei = toBigNumber(toWei(value));
-          const skrValue = wdiv(valueWei, this.props.system.tub.per).round(0);
+          const valueWei = toWei(value);
+          const skrValue = wdiv(valueWei, this.props.system.tub.per);
           this.setState({
             submitEnabled: false,
             skr: skrValue,
-            liqPrice: this.props.system.calculateLiquidationPrice(cup.ink.minus(skrValue), this.props.system.tab(cup)),
-            ratio: this.props.system.calculateRatio(cup.ink.minus(skrValue), this.props.system.tab(cup))
+            liqPrice: this.props.system.calculateLiquidationPrice( (cup.ink - skrValue), this.props.system.tab(cup)),
+            ratio: this.props.system.calculateRatio((cup.ink - skrValue), this.props.system.tab(cup))
           }, () => {
             this.props.dialog.error = this.props.dialog.warning = "";
-            if (valueWei.gt(0)) {
-              if (cup.avail_skr.lt(skrValue)) {
-                this.props.dialog.error = "This amount of ETH exceeds the maximum available to withdraw.";
-              } else if (cup.ink.minus(skrValue).lte(toWei(0.005)) && !cup.avail_skr.round(0).eq(skrValue)) {
-                this.props.dialog.error = `A CDP cannot be left with a dust amount lower than or equal to 0.005 PETH (${formatNumber(wmul(toBigNumber(toWei(0.005)), this.props.system.tub.per), 18)} ETH at actual price). You have to either leave more or withdraw the whole amount.`;
-              } else if (valueWei.gt(0) && this.props.system.tub.off === false && cup.art.gt(0) && this.state.ratio.lt(WAD.times(2))) {
-                this.props.dialog.warning = "The amount of ETH you are trying to withdraw is putting your CDP at risk.";
+            if (valueWei>(0)) {
+              if (cup.avail_skr<(skrValue)) {
+                this.props.dialog.error = "This amount of TRX exceeds the maximum available to withdraw.";
+              } else if (cup.ink - (skrValue)<=(toWei(0.005)) && !cup.avail_skr==(skrValue)) {
+                this.props.dialog.error = `A CDP cannot be left with a dust amount lower than or equal to 0.005 PTRX (${formatNumber(wmul(toBigNumber(toWei(0.005)), this.props.system.tub.per), 18)} TRX at actual price). You have to either leave more or withdraw the whole amount.`;
+              } else if (valueWei>(0) && this.props.system.tub.off === false && cup.art>(0) && this.state.ratio< (WAD*(2))) {
+                this.props.dialog.warning = "The amount of TRX you are trying to withdraw is putting your CDP at risk.";
                 this.setState({submitEnabled: true});
               } else {
                 this.setState({submitEnabled: true});
@@ -619,21 +628,21 @@ class Dialog extends React.Component {
         return (
           <DialogContent
             title="Withdraw Collateral"
-            text="How much ETH would you like to withdraw?"
+            text="How much TRX would you like to withdraw?"
             dialog={ this.props.dialog }
             form={
               <form ref={ input => this.updateValueForm = input } onSubmit={ this.submitForm }>
                 <div className="input-section">
-                  { this.renderNumberInput("ETH") }
+                  { this.renderNumberInput("TRX") }
                   {
-                    this.props.system.tab(cup).eq(0) &&
+                    this.props.system.tab(cup)==(0) &&
                     <div className="set-max" style={ {float: 'right', marginLeft: '22px'} }><a href="#action" onClick={ this.setMax }>Set max</a></div>
                   }
-                  <div className="peth-equiv" style={ {float: 'right'} }>{ printNumber(this.state.skr) } PETH <TooltipHint tipKey="what-is-peth" /></div>
+                  <div className="peth-equiv" style={ {float: 'right'} }>{ printNumber(this.state.skr) } PTRX <TooltipHint tipKey="what-is-peth" /></div>
                 </div>
                 <div className="info-section">
                   <div className="info-heading">Max. available to withdraw</div>
-                  <div className="info-value">{ cup ? printNumber(cup.avail_eth, 3) : "--" } ETH</div>
+                  <div className="info-value">{ cup ? printNumber(cup.avail_eth, 3) : "--" } TRX</div>
                   { this.renderDetails() }
                   { this.renderErrors() }
                 </div>
@@ -648,19 +657,19 @@ class Dialog extends React.Component {
 
       case "draw":
         this.cond = value => {
-          const valueWei = toBigNumber(toWei(value));
+          const valueWei = toWei(value);
           this.setState({
             submitEnabled: false,
-            liqPrice: this.props.system.calculateLiquidationPrice(cup.ink, this.props.system.tab(cup).add(valueWei)),
-            ratio: this.props.system.calculateRatio(cup.ink, this.props.system.tab(cup).add(valueWei))
+            liqPrice: this.props.system.calculateLiquidationPrice(cup.ink, this.props.system.tab(cup)+(valueWei)),
+            ratio: this.props.system.calculateRatio(cup.ink, this.props.system.tab(cup)+(valueWei))
           }, () => {
             this.props.dialog.error = this.props.dialog.warning = "";
-            if (valueWei.gt(0)) {
-              if (this.props.system.sin.totalSupply.add(valueWei).gt(this.props.system.tub.cap)) {
+            if (valueWei>(0)) {
+              if (this.props.system.sin.totalSupply+(valueWei)>(this.props.system.tub.cap)) {
                 this.props.dialog.error = "This amount of SAI exceeds the system debt ceiling.";
-              } else if (cup.avail_dai.lt(valueWei)) {
+              } else if (cup.avail_dai<(valueWei)) {
                 this.props.dialog.error = "You have insufficient collateral deposited to generate this amount of SAI. Deposit more collateral first.";
-              } else if (this.state.ratio.lt(WAD.times(2))) {
+              } else if (this.state.ratio<(WAD*(2))) {
                 this.props.dialog.warning = "The amount of SAI you are trying to generate against the collateral is putting your CDP at risk.";
                 this.setState({submitEnabled: true});
               } else {
@@ -699,33 +708,33 @@ class Dialog extends React.Component {
           const valueWei = toBigNumber(toWei(value));
           this.setState({
             submitEnabled: false,
-            liqPrice: this.props.system.calculateLiquidationPrice(cup.ink, this.props.system.tab(cup).minus(valueWei)),
-            ratio: this.props.system.calculateRatio(cup.ink, this.props.system.tab(cup).minus(valueWei))
+            liqPrice: this.props.system.calculateLiquidationPrice(cup.ink, this.props.system.tab(cup)-(valueWei)),
+            ratio: this.props.system.calculateRatio(cup.ink, this.props.system.tab(cup)-(valueWei))
           }, () => {
             this.props.dialog.error = this.props.dialog.warning = "";
-            if (valueWei.gt(0)) {
+            if (valueWei>(0)) {
               const futureGovDebtSai =  wmul(
                                           valueWei,
                                           wdiv(
                                             this.props.system.futureRap(this.props.system.tub.cups[dialog.cupId], 1200),
                                             this.props.system.tab(this.props.system.tub.cups[dialog.cupId])
                                           )
-                                        ).round(0);
+                                        );
               const futureGovDebtMKR =  wdiv(
                                           futureGovDebtSai,
                                           this.props.system.pep.val
-                                        ).round(0);
-              const valuePlusGovFee = this.state.govFeeType === "dai" ? valueWei.add(futureGovDebtSai.times(1.25)) : valueWei; // If fee is paid in DAI we add an extra 25% (spread)
-              if (this.props.system.dai.myBalance.lt(valuePlusGovFee)) {
+                                        );
+              const valuePlusGovFee = this.state.govFeeType === "dai" ? valueWei+(futureGovDebtSai*(1.25)) : valueWei; // If fee is paid in DAI we add an extra 25% (spread)
+              if (this.props.system.dai.myBalance<(valuePlusGovFee)) {
                 this.props.dialog.error = "You don't have enough SAI in your wallet to wipe this amount.";
-              } else if (this.props.system.tab(cup).lt(valueWei)) {
+              } else if (this.props.system.tab(cup)<(valueWei)) {
                 this.props.dialog.error = "You are trying to payback more SAI than the amount of SAI outstanding in your CDP.";
-              } else if (this.state.govFeeType === "mkr" && futureGovDebtMKR.gt(this.props.system.gov.myBalance)) {
+              } else if (this.state.govFeeType === "mkr" && futureGovDebtMKR>(this.props.system.gov.myBalance)) {
                 this.props.dialog.error = "You don't have enough MKR in your wallet to wipe this amount.";
-              } else if (this.state.ratio.lt(WAD.times(1.5))) {
+              } else if (this.state.ratio<(WAD*(1.5))) {
                 this.props.dialog.warning = "Your CDP is below the minimum collateralization ratio and currently at risk. You should payback SAI or deposit more collateral immediately.";
                 this.setState({submitEnabled: true});
-              } else if (this.state.ratio.lt(WAD.times(2))) {
+              } else if (this.state.ratio<(WAD*(2))) {
                 this.props.dialog.warning = "Even if you payback this amount of SAI, your CDP will still be at risk.";
                 this.setState({submitEnabled: true});
               } else {
@@ -734,7 +743,7 @@ class Dialog extends React.Component {
             }
           });
         }
-        const indentedText = (!this.props.system.dai.allowance.eq(BIGGESTUINT256) || !this.props.system.gov.allowance.eq(BIGGESTUINT256))
+        const indentedText = (!this.props.system.dai.allowance==(BIGGESTUINT256) || !this.props.system.gov.allowance==(BIGGESTUINT256))
           ? "You might be requested to sign up to three transactions if there is not enough allowance in SAI and/or MKR to complete this transaction."
           : "";
         return (

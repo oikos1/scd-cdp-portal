@@ -36,7 +36,7 @@ const config = {
 }[env];
 
 export const mixpanelInit = () => {
-  console.debug(
+  console.log(
     `[Mixpanel] Tracking initialized for ${env} env using ${
       config.mixpanel.token
     }`
@@ -47,7 +47,7 @@ export const mixpanelInit = () => {
 
 export const mixpanelIdentify = (id, props = null) => {
   if (typeof mixpanel.config === 'undefined') return;
-  console.debug(
+  console.log(
     `[Mixpanel] Identifying as ${id} ${props && props.wallet ? `using wallet ${props.wallet}` : ''}`
   );
   mixpanel.identify(id);
@@ -75,7 +75,7 @@ export const userSnapInit = () => {
 };
 
 export const gaInit = () => {
-  console.debug(
+  console.log(
     `[GA] Tracking initialized for ${env} env using ${config.gaTrackingId}`
   );
   ReactGA.initialize(config.gaTrackingId);

@@ -113,7 +113,7 @@ class WalletHardHWSelector extends React.Component {
                 this.props.network.hw.option.substring(0, 6) === "ledger" &&
                 <React.Fragment>
                   <h2>Plug in Ledger &amp; Enter Pin</h2>
-                  <p className="typo-c align-center">Open ETH application and make sure Contract Data and Browser Support are enabled.</p>
+                  <p className="typo-c align-center">Open TRX application and make sure Contract Data and Browser Support are enabled.</p>
                 </React.Fragment>
               }
               {
@@ -139,8 +139,8 @@ class WalletHardHWSelector extends React.Component {
                       this.props.network.hw.option.substring(0, 6) === "ledger" &&
                       <div className="typo-c">
                         <ol>
-                          <li>Unlock your Ledger and open the ETH application.</li>
-                          <li>Verify Contract Data &amp; Browser Support are enabled in the ETH settings.</li>
+                          <li>Unlock your Ledger and open the TRX application.</li>
+                          <li>Verify Contract Data &amp; Browser Support are enabled in the TRX settings.</li>
                           <li>If Browser Support is not an option in settings, update to the latest firmware.</li>
                         </ol>
                       </div>
@@ -158,7 +158,7 @@ class WalletHardHWSelector extends React.Component {
                   <React.Fragment>
                     <h2 className="connect-success">{ capitalize(this.props.network.hw.option.replace("-", " ")) } Connected</h2>
                     <section style={ { width: "75%", margin: "0 auto" } }>
-                      <p className="typo-c align-center" style={ {color: "#fff"} }><span className={ this.props.network.hw.network === "main" ? "green-dot" : "purple-dot" }></span>{ this.props.network.hw.network === "main" ? "Main Ethereum" : capitalize(this.props.network.hw.network) + " Test" } Network</p>
+                      <p className="typo-c align-center" style={ {color: "#fff"} }><span className={ this.props.network.hw.network === "main" ? "green-dot" : "purple-dot" }></span>{ this.props.network.hw.network === "main" ? "Main Tron" : capitalize(this.props.network.hw.network) + " 1Test" } Network</p>
                       <div style={ {margin: "2.5rem 0 0"} }>
                         <Select
                           name="wallet-address"
