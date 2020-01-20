@@ -254,12 +254,12 @@ export const getContractAddr = (contractFrom, contractName) => {
 
 export const allowance = (token, srcAddr, dstAddr) => {
   return new Promise((resolve, reject) => {
-    objects[token].allowance.call(srcAddr, dstAddr, (e, r) => {
-      if (!e) {
+    console.log("got token ", objects[token], "token", token)
+    objects[token].allowance(srcAddr, dstAddr).call().then((r) => {
         resolve(r);
-      } else {
-        reject(e);
-      }
+    }).catch((err) => {
+        reject(err);
+
     });
   });
 }

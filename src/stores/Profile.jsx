@@ -20,11 +20,12 @@ export default class ProfileStore {
   setProxyFromChain = (callbacks = null) => {
     return new Promise((resolve, reject) => {
       console.log("Checking proxy...")
-      daisystem.getContracts(settings.chain[this.rootStore.network.network].proxyRegistry, this.rootStore.network.defaultAccount).then(r => {
-        if (r && r[2] && this.rootStore.transactions.setLatestBlock(r[0].toNumber())) {
-          this.setProxy(r[2]);
+      daisystem.getContracts(settings.chain["main"].proxyRegistry, this.rootStore.network.defaultAccount).then(r => {
+        console.log("got r", r)
+        if ( r.proxy && this.rootStore.transactions.setLatestBlock(r.blockNumber.toNumber())) {
+          this.setProxy(r.proxy);
           callbacks && this.rootStore.transactions.executeCallbacks(callbacks);
-          resolve(r[2]);
+          resolve(r.proxy);
         } else {
           // We force to check again until we get the result
           console.log("Proxy still not found, trying again in 3 seconds...");

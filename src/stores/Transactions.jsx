@@ -95,7 +95,7 @@ export default class TransactionsStore {
 
   sendTransaction = (title, func, params, options, callbacks) => {
     const cdpCreationTx = params[0] === blockchain.objects.proxyRegistry.address // This means it is calling to the createLockAndDraw
-                       // ||   (typeof params[1] === "string" && methodSig("lockAndDraw(address,uint256)") === params[1].substring(0, 10));
+                        ||   (typeof params[1] === "string" &&  params[1].indexOf(methodSig("lockAndDraw(address,address,uint256)")) > -1);
 
     const id = Math.random();
 
@@ -164,9 +164,11 @@ export default class TransactionsStore {
     }
   }
 
-  logTransactionConfirmed = object => {
-    this.setLatestBlock(object.blockNumber);
-    const tx = object.transactionHash;
+  logTransactionConfirmed = async (object) => {
+    let cB = await window.tronWeb.trx.getCurrentBlock();   
+    console.log("got confirmation object", object, "latestBlock", cB);
+    this.setLatestBlock(cB.block_header.raw_data.number);
+    const tx = object.txID;
     const msgTemp = "Transaction TX was confirmed.";
     if (this.registry[tx] && this.registry[tx].pending) {
       const registry = {...this.registry};
@@ -264,7 +266,8 @@ export default class TransactionsStore {
             break;
         }
         object && object[method[1]](...args);
-        //console.log("called", object[method[1]](...args))
+
+        //console.log("object",object, "method",  method[1], "called", object[method[1]](...args) )
       }
     }, timeout);
   }
