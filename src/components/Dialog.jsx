@@ -724,7 +724,8 @@ class Dialog extends React.Component {
                                           futureGovDebtSai,
                                           this.props.system.pep.val
                                         );
-              const valuePlusGovFee = this.state.govFeeType === "dai" ? valueWei+(futureGovDebtSai*(1.25)) : valueWei; // If fee is paid in DAI we add an extra 25% (spread)
+              const valuePlusGovFee = this.state.govFeeType === "sai" ? valueWei+(futureGovDebtSai*(1.25)) : valueWei; // If fee is paid in DAI we add an extra 25% (spread)
+              console.log("dai balance is", this.props.system.dai.myBalance.toString(), "fee", valuePlusGovFee)
               if (this.props.system.dai.myBalance<(valuePlusGovFee)) {
                 this.props.dialog.error = "You don't have enough SAI in your wallet to wipe this amount.";
               } else if (this.props.system.tab(cup)<(valueWei)) {

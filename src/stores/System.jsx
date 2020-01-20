@@ -679,6 +679,7 @@ export default class SystemStore {
     //value ? -1 : 0
     if (value > 0)
       value = "1000000000000000000000000000000";
+    else
     this.rootStore.transactions.askPriceAndSend(title, blockchain.objects[token].approve, [this.rootStore.profile.proxy, value], {}, callbacks);
   }
 
