@@ -665,7 +665,8 @@ class Dialog extends React.Component {
           }, () => {
             this.props.dialog.error = this.props.dialog.warning = "";
             if (valueWei>(0)) {
-              if (this.props.system.sin.totalSupply+(valueWei)>(this.props.system.tub.cap)) {
+                console.log("values added", this.props.system.sin.totalSupply.add(valueWei).toString(), "> ", this.props.system.tub.cap.toString())
+              if (this.props.system.sin.totalSupply.add(valueWei).gt(this.props.system.tub.cap)) {
                 this.props.dialog.error = "This amount of SAI exceeds the system debt ceiling.";
               } else if (cup.avail_dai<(valueWei)) {
                 this.props.dialog.error = "You have insufficient collateral deposited to generate this amount of SAI. Deposit more collateral first.";

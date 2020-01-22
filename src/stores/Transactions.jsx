@@ -159,8 +159,8 @@ export default class TransactionsStore {
     console.log(msgTemp.replace("TX", tx));
     this.notificator.hideNotification(id);
     if (!this.registry[tx].cdpCreationTx) {
-      //etherscanTx(this.rootStore.network.network, msgTemp.replace("TX", `${tx.substring(0,10)}...`), tx);
-      this.notificator.info(tx, title, tx, false);
+      //;
+      this.notificator.info(tx, title,etherscanTx(this.rootStore.network.network, msgTemp.replace("TX", `${tx.substring(0,10)}...`), tx), false);
     }
   }
 

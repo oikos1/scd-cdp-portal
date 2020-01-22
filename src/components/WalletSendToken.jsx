@@ -3,7 +3,7 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 
 // Utils
-import {printNumber, formatNumber, isAddress, toWei} from "../utils/helpers";
+import {printNumber, formatNumber, isAddress, toWei, toBigNumber} from "../utils/helpers";
 
 @inject("profile")
 @inject("system")
@@ -27,13 +27,18 @@ class WalletSendToken extends React.Component {
     const destination = this.destination.value;
     this.setState({ fieldErrors: {} });
 
-    if (!destination || !isAddress(destination)) {
-      this.setState({ fieldErrors: { address: "Please enter a valid address" } });
-    } else if (!amount) {
+    //if (!destination || !isAddress(destination)) {
+    //  this.setState({ fieldErrors: { address: "Please enter a valid address" } });
+    //} else 
+    if (!amount) {
       this.setState({ fieldErrors: { amount: "Please enter a valid amount" } });
-    } else if (this.props.system[token].myBalance.lt(toWei(amount))) {
+    } else if (toBigNumber(this.props.system[token].myBalance).lt(toWei(amount)) ) {
+
+      console.log("balance is ", this.props.system[token].myBalance.toString(), "amount",toWei(amount), "condition ", (toBigNumber(this.props.system[token].myBalance).lt(toWei(amount)) ) )
+
       this.setState({ fieldErrors: { amount: `Not enough balance to transfer ${amount} ${this.props.tokenName(token)}` } });
     } else {
+      console.log("transferToken")
       this.props.system.transferToken(token, destination, amount);
       this.amount.value = "";
       this.destination.value = "";

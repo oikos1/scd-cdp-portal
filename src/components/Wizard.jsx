@@ -110,7 +110,7 @@ class Wizard extends Component {
         state.error = false;
         //state.submitEnabled = true;
         return state;
-        /*if (state.eth.gt(0) && this.props.system.eth.myBalance.lt(state.eth)) {
+        if (state.eth.gt(0) && this.props.system.eth.myBalance.lt(state.eth)) {
           state.error = "The amount of TRX to be deposited exceeds your current balance.";
           return state;
         } else if (state.skr.gt(0) && state.skr.round(0).lte(toWei(0.005))) {
@@ -119,7 +119,8 @@ class Wizard extends Component {
         }
 
         if (state.eth.gt(0) && state.dai.gt(0)) {
-          if (this.props.system.sin.totalSupply.add(state.dai).gt(this.props.system.tub.cap)) {
+          console.log("total SIN supply",this.props.system.sin.totalSupply.toFixed(), "DAI", state.dai.toFixed(), "cap", this.props.system.tub.cap )
+          if ( (this.props.system.sin.totalSupply+(state.dai)) > (this.props.system.tub.cap)) {
             state.error = "The amount of SAI you are trying to generate exceeds the current system debt ceiling.";
           } else if (state.dai.gt(state.maxDaiAvail)) {
             state.error = "The amount of TRX to be deposited is not enough to draw this amount of SAI.";
@@ -132,7 +133,7 @@ class Wizard extends Component {
             state.submitEnabled = true;
           }
           return state;
-        }*/
+        }
       });
     });
   }

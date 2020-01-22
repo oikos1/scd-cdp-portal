@@ -74,7 +74,7 @@ class CupHistory extends React.Component {
                             image = historyIconLocked;
                             break;
                           case "FREE":
-                            message = <React.Fragment>Withdrew {printNumber(toWei(action.arg * action.per))} TRX ({printNumber(toWei(action.arg))} PTRX) from your CDP</React.Fragment>;
+                            message = <React.Fragment>Withdrew {printNumber(action.arg * action.per)} TRX ({printNumber(action.arg)} PTRX) from your CDP</React.Fragment>;
                             image = historyIconPayback;
                             break;
                           case "DRAW":
@@ -90,8 +90,9 @@ class CupHistory extends React.Component {
                             image = historyIconUnknown;
                             break;
                           case "BITE":
-                            const art = toWei(this.props.history[key + 1].art);
-                            const liqInk = toWei(this.props.history[key + 1].ink - action.ink);
+                            console.log("cup history <------------------------------------------------------------------------------------",this.props.history[key + 1][0])
+                            const art = (this.props.history[key + 1].art);
+                            const liqInk = (this.props.history[key + 1].ink - action.ink);
                             const liqETH = liqInk * action.per;
                             const pip = toWei(this.props.history[key].pip);
                             message = <React.Fragment>

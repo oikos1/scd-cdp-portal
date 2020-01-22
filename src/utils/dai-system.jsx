@@ -113,9 +113,12 @@ export const getBiteNotification = (cupId, history, alreadyClosed) => {
   if (latestAction && latestAction.act === "BITE" && !alreadyClosed) {
     const prevlatestAction = history[1];
     const date = formatDate((new Date(latestAction.time)).getTime() / 1000);
-    const art = toWei(prevlatestAction.art);
+    const art = prevlatestAction.art;
+    
+    console.log("calc liq price with", art, "*", 1.5, "/", latestAction.per, "/", prevlatestAction.ink);
+
     const liqPrice =  (art * 1.5 / latestAction.per) / prevlatestAction.ink;
-    const liqInk = toWei(prevlatestAction.ink - latestAction.ink);
+    const liqInk = prevlatestAction.ink - latestAction.ink;
     const liqETH = liqInk * latestAction.per;
     const liqInkCol = liqInk / 1.13;
     const liqETHCol = liqInkCol * latestAction.per;
@@ -124,7 +127,7 @@ export const getBiteNotification = (cupId, history, alreadyClosed) => {
     const pip = toWei(latestAction.pip);
     return <React.Fragment>
               <div className="grouped-section">
-                Your CDP #{cupId} was liquidated on { date } to pay back { printNumber(art) } SAI.
+                Your CDP #{cupId} was liquidated on { date } to pay back { art } SAI.
               </div>
               <div className="grouped-section">
                 <div className="dark-text">Total TRX (PTRX) liquidated</div>
@@ -146,7 +149,7 @@ export const getBiteNotification = (cupId, history, alreadyClosed) => {
               </div>
               <div className="grouped-section">
                 <div className="dark-text">Became vulnerable to liquidation @ price</div>
-                <div style={ {fontSize: "1.3rem", fontWeight: "600" } }>{ printNumber(liqPrice)} USD</div>
+                <div style={ {fontSize: "1.3rem", fontWeight: "600" } }>{ liqPrice} USD</div>
                 <div className="dark-text">Liquidated @ price</div>
                 <div style={ {fontSize: "1.3rem", fontWeight: "600" } }>{ printNumber(pip) } USD</div>
               </div>
