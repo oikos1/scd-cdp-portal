@@ -146,7 +146,7 @@ export default class SystemStore {
 
   init = async (top, tub, tap, vox, pit, pip, pep, gem, gov, skr, dai, sin, balance) => {
      
-    //if (this.rootStore.network.network && !this.rootStore.network.stopIntervals) {
+    if (this.rootStore.network.network && !this.rootStore.network.stopIntervals) {
       let _balance = (balance / (10**6)) * (10**18) ;
 
       console.log("wallet balance", _balance )
@@ -206,10 +206,10 @@ export default class SystemStore {
       this.setMyCupsFromChain(false, [], true);
       this.setMyLegacyCupsFromChain([], true);
 
-      if (typeof blockchain.objects["tub"] !== "undefined")
-        this.setFiltersTub();
+      //if (typeof blockchain.objects["tub"] !== "undefined")
+      //  this.setFiltersTub();
 
-    //}
+    }
   }
 
   setAggregatedValues = (callbacks = [], firstLoad = false, ignoreMutex = false) => {
@@ -604,11 +604,12 @@ export default class SystemStore {
           for (var i=0;i<cupSignatures.length;i++) {
             console.log(cupSignatures[i])
           } 
-          console.log("cup found ------------------------------------------------------->", data["result"].sig, "bite", cupSignatures[4], "lock", cupSignatures[0],)
+          //console.log("cup found ------------------------------------------------------->", data["result"].sig, "bite", cupSignatures[4], "lock", cupSignatures[0],)
 
           if (cupSignatures.indexOf( "0x"+data["result"].sig ) !== -1 && typeof data["result"].foo !== "undefined" ) {
             //&&typeof this.tub.cups[parseInt(data["result"].foo, 16)] !== "undefined"
-            console.log("cup involved -------------------------> ", this.tub.cups[parseInt(data["result"].foo, 16)], "id", data["result"].foo);
+            console.log("cup involved -------------------------> ", this.tub.cups[parseInt(data["result"].foo, 16)], "id", data["result"].foo, "sig", "0x"+data["result"].sig);
+
             this.reloadCupData(parseInt(data["result"].foo, 16));
             this.setAggregatedValues();
           
@@ -828,8 +829,8 @@ export default class SystemStore {
           console.log("showing tub address", this.tub.address, "proxy address", this.rootStore.profile.proxy);
 
           title = `Create CDP + Deposit ${eth.valueOf()} ETH + Generate ${dai.valueOf()} SAI`;
-          action = `${methodSig(`lockAndDraw(address,address,uint256)`)}${addressToBytes32(tronWeb.address.toHex(this.tub.address), false)}${addressToBytes32(this.rootStore.profile.proxy, false)}${toBytes32(toWei(dai), false)}`;
-        //  gasLimit = 800000;
+          action = `${methodSig(`lockAndDraw(address,uint256)`)}${addressToBytes32(tronWeb.address.toHex(this.tub.address), false)}${toBytes32(toWei(dai), false)}`;
+          //gasLimit = 800000;
         } else {
           title = `Create Proxy + Create CDP + Deposit ${eth.valueOf()} TRX + Generate ${dai.valueOf()} SAI`;
           //if (this.shouldSetGasLimit()) {

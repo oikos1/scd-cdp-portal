@@ -95,7 +95,7 @@ export default class TransactionsStore {
 
   sendTransaction = (title, func, params, options, callbacks) => {
     const cdpCreationTx = params[0] === blockchain.objects.proxyRegistry.address // This means it is calling to the createLockAndDraw
-                        ||   (typeof params[1] === "string" &&  params[1].indexOf(methodSig("lockAndDraw(address,address,uint256)")) > -1);
+                        ||   (typeof params[1] === "string" &&  params[1].indexOf(methodSig("lockAndDraw(address,uint256)")) > -1);
 
     const id = Math.random();
 

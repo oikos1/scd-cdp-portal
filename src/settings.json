@@ -3,15 +3,15 @@
   "chain": {
     "main": {
       "nodeURL": "http://192.168.0.102:9090",
-      "fromBlock": 1,
+      "fromBlock": 21270,
       "service": "http://localhost:31337/v1",
       "serviceTimeout": 5000,
       "chart": true,
-      "saiValuesAggregator": "TVgZie1YZNB4kX5NZXn14VsDCwe5FXcoqv",
-      "proxyRegistry": "TFaQB3rNNXKs4xZBonuBqrQewUPCkceRVz",
-      "proxy": "TQiShWqeQABkzXf5kXRAvRYZWfKAi6C4Hk",      
-      "saiProxyCreateAndExecute": "TE2gVWupejqZGRnLvynZkiNtTrfzi7VNmg",
-      "tub": "TPX16xTU73cFJU9ZyLHSZ7E3PVWszDSxNP",
+      "saiValuesAggregator": "TUVZEkz8BZxym2ZruvupY1SNgGmBBgtJtv",
+      "proxyRegistry": "TMAp3A42RYKff8ixX5c2L5suq4WR5Y7Efk",
+      "proxy": "TUfXhj7L9o5mvAkBaRmmpqSHApCeG8vpDm",      
+      "saiProxyCreateAndExecute": "TGpkF9tZp9czKEqhK5HXzGmstYsdB9cvv7",
+      "tub": "TCHizMDb7d5118yJpn5NKKFtiiLKsxUmDr",
       "otc": "0x0000000000000000000000000000000000000123"
     }
   }
