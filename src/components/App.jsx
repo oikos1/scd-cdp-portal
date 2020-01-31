@@ -44,7 +44,7 @@ class App extends React.Component {
           <React.Fragment>
             <Routes />
             <Notify ref="notificator" />
-            <NotifySetUp />
+            //<NotifySetUp />
             <Modal show={rootStore.transactions.priceModal.open} close={rootStore.transactions.closePriceModal}>
               <PriceModal />
             </Modal>

@@ -23,6 +23,7 @@ export default class NetworkStore {
   @observable network = "";
   @observable hw = {active: false, showSelector: false, option: null, derivationPath: null, addresses: [], loading: false, error: null, network: ""};
   @observable downloadClient = false;
+  
   isMobile = checkIsMobile.any;
   isMobileWeb3Wallet = blockchain.isMobileWeb3Wallet();
   walletLinkProvider = null;
@@ -87,7 +88,7 @@ export default class NetworkStore {
       let tmpTimer2 = null;  
 
       if (window.tronWeb){
-            console.log(" tWda" , window.tronWeb.defaultAddress);
+            //console.log(" tWda" , window.tronWeb.defaultAddress);
             if (window.tronWeb.defaultAddress.base58 != false) {
               //clearInterval(tmpTimer2);
               walletAddress = window.tronWeb.defaultAddress.base58;

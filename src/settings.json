@@ -7,11 +7,11 @@
       "service": "http://localhost:31337/v1",
       "serviceTimeout": 5000,
       "chart": true,
-      "saiValuesAggregator": "TUVZEkz8BZxym2ZruvupY1SNgGmBBgtJtv",
-      "proxyRegistry": "TMAp3A42RYKff8ixX5c2L5suq4WR5Y7Efk",
-      "proxy": "TUfXhj7L9o5mvAkBaRmmpqSHApCeG8vpDm",      
-      "saiProxyCreateAndExecute": "TGpkF9tZp9czKEqhK5HXzGmstYsdB9cvv7",
-      "tub": "TCHizMDb7d5118yJpn5NKKFtiiLKsxUmDr",
+      "saiValuesAggregator": "TDJNUNQe5LBU9VBg6ejXuN82gkfVfXU9ip",
+      "proxyRegistry": "TFawoBvVPSP55xdC9rYRy3PQGxcCsP6ppw",
+      "proxy": "TLn4uaiqAqQ7e8DHf1sdt8JYb2u9hZ9ic4",      
+      "saiProxyCreateAndExecute": "TVzMgYz8A7bUwASzPBd1FZ2u9Ax1jbcSY1",
+      "tub": "TALWp4dNsP6VEEeMzD39f2VwnnCogMrvYm",
       "otc": "0x0000000000000000000000000000000000000123"
     }
   }
