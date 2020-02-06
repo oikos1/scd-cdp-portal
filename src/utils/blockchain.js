@@ -403,9 +403,9 @@ export const checkNetwork = () => {
 export async function getStabilityFee() {
   const { nodeURL, tub } = settings.chain.main;
   var _nodeURL = ""
-  const rawResponse = await fetch('http://192.168.0.102:9090/wallet/triggersmartcontract', {
+  const rawResponse = await fetch('http://192.168.0.108:9090/wallet/triggersmartcontract', {
     method: 'POST',
-    url: 'http://192.168.0.102:9090/wallet/triggersmartcontract',
+    url: 'http://192.168.0.108:9090/wallet/triggersmartcontract',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'

@@ -2,16 +2,15 @@
   "contentUrl": "https://content.makerfoundation.com/content/dai-dashboard",
   "chain": {
     "main": {
-      "nodeURL": "http://192.168.0.102:9090",
+      "nodeURL": "http://192.168.0.108:9090",
       "fromBlock": 21270,
       "service": "http://localhost:31337/v1",
       "serviceTimeout": 5000,
       "chart": true,
-      "saiValuesAggregator": "TDJNUNQe5LBU9VBg6ejXuN82gkfVfXU9ip",
-      "proxyRegistry": "TFawoBvVPSP55xdC9rYRy3PQGxcCsP6ppw",
-      "proxy": "TLn4uaiqAqQ7e8DHf1sdt8JYb2u9hZ9ic4",      
-      "saiProxyCreateAndExecute": "TVzMgYz8A7bUwASzPBd1FZ2u9Ax1jbcSY1",
-      "tub": "TALWp4dNsP6VEEeMzD39f2VwnnCogMrvYm",
+      "saiValuesAggregator": "TYoUpVh5sBXQx9MmwYnw94DfjRM2fPqeAR",
+      "proxyRegistry": "TSmBh3SqGQ58HThcWLPpK5TQAX64xhkg38",
+      "saiProxyCreateAndExecute": "THeWb2WnUdSZx3G2ZmQVA54Pozaqsc3hZ4",
+      "tub": "THjpCK4eBHfpaskepenJ8Zmf6ZZim1AJCq",
       "otc": "0x0000000000000000000000000000000000000123"
     }
   }

@@ -64,9 +64,9 @@ class RootStore {
       console.log('Invalid address provided');
     }
 
-    const rawResponse = await fetch('http://192.168.0.102:9090/wallet/getaccount', {
+    const rawResponse = await fetch('http://192.168.0.108:9090/wallet/getaccount', {
       method: 'POST',
-      url: 'http:///192.168.0.102:9090/wallet/getaccount',
+      url: 'http:///192.168.0.108:9090/wallet/getaccount',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
